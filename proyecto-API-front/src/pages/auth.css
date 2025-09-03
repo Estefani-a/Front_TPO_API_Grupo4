@@ -1,4 +1,3 @@
-/* register.css - COPIA EXACTA del login mejorado */
 body {
   margin: 0;
   height: 100vh;
@@ -7,10 +6,12 @@ body {
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   
-  /* Fondo con gradiente animado (tu hermoso fondo) */
+  /* Fondo con gradiente animado*/
   background: linear-gradient(-45deg, #04addc, #89dcf0, #2a454a, #0a5891, #142a3a);
+ /* el gradiente tiene una inclinacion de -45 grados y varios colores */
   background-size: 400% 400%;
-  animation: gradientMove 15s ease infinite;
+  animation: gradientMove 15s ease infinite; /*dura 15 seg  se repite infinitamente, ease significa que va lento rapido lento*/
+  /*hace que el fondo sea 4 veces as grande que el viewport para permitir la animación*/
 }
 
 /* Animación del fondo */
@@ -23,7 +24,7 @@ body {
   }
   100% {
     background-position: 0% 50%;
-  }
+  } /*Mueve la posición del fondo de 0% a 100% y vuelta, creando el efecto de "olas" de color*/
 }
 
 /* Container principal - DESKTOP FIRST */
@@ -37,14 +38,14 @@ body {
 
 /* Tarjeta del formulario - TAMAÑO DESKTOP */
 .form-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.10); /* Fondo semi-transparente Color blanco con 15% de opacidad Permite ver el fondo a través del elemento */
+  backdrop-filter: blur(20px); /* DESENFOQUE del fondo tod lo que esta detras del elemento*/
   padding: 3.5rem 3rem;
-  border-radius: 25px;
+  border-radius: 25px; /* Borde sutil */
   box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 25px 50px rgba(0, 0, 0, 0.2), /* Sombra principal */
+    0 0 0 1px rgba(255, 255, 255, 0.1),  /* Borde interno */
+    inset 0 1px 0 rgba(255, 255, 255, 0.2); /* Brillo superior interno */
   width: 480px;
   min-width: 450px;
   text-align: center;
@@ -88,51 +89,56 @@ body {
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
 }
 
-/* Inputs mejorados - CRISTAL */
+/* CRISTAL */
 .form-group input {
-  width: 100%;
+  width: 100%; /* El input ocupa todo el ancho disponible del contenedor padre */
   padding: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.2); /* Borde de 2px, blanco con 20% opacidad */
+  border-radius: 15px; /* Esquinas redondeadas con radio de 15px */
   font-size: 1rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  transition: all 0.3s ease; /* Anima TODOS los cambios de propiedades en 0.3 segundos, 'ease' = transición suave (lento-rápido-lento) */
+  background: rgba(255, 255, 255, 0.1);   /* permite ver el fondo animado a traves del input Alpha = transparencia (0 = invisible, 1 = opaco) */
+  backdrop-filter: blur(10px);   /* CLAVE: Desenfoca todo lo que está DETRÁS del input */                 
   box-sizing: border-box;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.95); /* Color del texto: blanco con 95% opacidad (casi opaco) */
 }
 
 .form-group input:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 
-    0 0 0 3px rgba(255, 255, 255, 0.1),
-    0 8px 25px rgba(0, 0, 0, 0.15);
-  background: rgba(255, 255, 255, 0.15);
+  outline: none;  /* Quita el borde azul por defecto del navegador */
+  border-color: rgba(255, 255, 255, 0.4); /*Borde más visible cuando está activo, Cambia opacidad del borde de 20% a 40% */
+  box-shadow:   /* Efectos de sombra múltiples para crear "elevación" */
+    0 0 0 3px rgba(255, 255, 255, 0.1), /* Anillo de focus: 3px alrededor, blanco 10% */
+    0 8px 25px rgba(0, 0, 0, 0.15);   /* Sombra de elevación: 8px hacia abajo, 25px difuminado */
+  background: rgba(255, 255, 255, 0.15); /* Fondo más opaco cuando está enfocado */
 }
-
+/*texto de ejemplo blanco con 60 de porcentaje de opacidad*/
 .form-group input::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
 
 /* Botón principal MEJORADO */
 .btn {
-  width: 100%;
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, #04addc 0%, #0a5891 100%);
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 1rem;
-  text-transform: none;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(4, 173, 220, 0.3);
+  width: 100%;                    /* El botón ocupa todo el ancho disponible del contenedor */
+  padding: 1rem 2rem;             /* Espaciado interno: 16px arriba/abajo, 32px izq/derecha */
+  background: linear-gradient(135deg, #04addc 0%, #0a5891 100%);  /* Gradiente diagonal de azul claro a azul oscuro */
+                                  /* 135deg = diagonal de esquina sup-izq a inf-der */
+                                  /* #04addc = azul turquesa, #0a5891 = azul marino */
+  border: none;                   /* Quita el borde por defecto de los botones */
+  border-radius: 12px;            /* Esquinas redondeadas con radio de 12px */
+  color: white;                   /* Color del texto: blanco */
+  font-size: 1.1rem;              /* Tamaño de fuente: 17.6px (1.1 × 16px base) */
+  font-weight: 600;               /* Grosor de fuente: semi-bold (más grueso que normal) */
+  cursor: pointer;                /* Cambia el cursor a manita cuando pasa por encima */
+  transition: all 0.3s ease;      /* Anima todos los cambios de propiedades en 0.3 segundos */
+  margin-top: 1rem;               /* Espacio de 16px arriba del botón */
+  text-transform: none;           /* No transforma el texto (mantiene mayús/minús originales) */
+  letter-spacing: 0.5px;          /* Espacio entre letras: 0.5px adicional */
+  box-shadow: 0 4px 15px rgba(4, 173, 220, 0.3);  /* Sombra coloreada debajo del botón */
+                                  /* 0 = sin desplazamiento horizontal */
+                                  /* 4px = desplazamiento vertical hacia abajo */
+                                  /* 15px = difuminado de la sombra */
+                                  /* rgba(4,173,220,0.3) = color azul turquesa con 30% opacidad */
 }
-
 .btn:hover {
   background: linear-gradient(135deg, #0398c9 0%, #094d7a 100%);
   transform: translateY(-2px);
