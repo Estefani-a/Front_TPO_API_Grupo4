@@ -1,0 +1,58 @@
+{
+  "games": [
+    { "id": 1, "title": "Counter-Strike 2", "price": 499.99, "discountPercent": 0,
+      "cover": "https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg",
+      "images": ["https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg"],
+      "description": "Shooter competitivo 5v5 con enfoque en precisión y trabajo en equipo.",
+      "rating": 4.6, "platforms": ["Windows"] },
+
+    { "id": 2, "title": "Grand Theft Auto V", "price": 899.99, "discountPercent": 0,
+      "cover": "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg",
+      "images": ["https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg"],
+      "description": "Acción en mundo abierto en Los Santos con campaña y GTA Online.",
+      "rating": 4.8, "platforms": ["Windows"] },
+
+    { "id": 3, "title": "Red Dead Redemption 2", "price": 1199.99, "discountPercent": 10,
+      "cover": "https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/header.jpg",
+      "images": ["https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/header.jpg"],
+      "description": "Aventura épica del Viejo Oeste con historia cinematográfica.",
+      "rating": 4.9, "platforms": ["Windows"] },
+
+    { "id": 4, "title": "Cyberpunk 2077", "price": 999.99, "discountPercent": 20,
+      "cover": "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg",
+      "images": ["https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"],
+      "description": "RPG de mundo abierto en Night City con narrativa ramificada.",
+      "rating": 4.4, "platforms": ["Windows"] },
+
+    { "id": 5, "title": "HELLDIVERS™ 2", "price": 1299.99, "discountPercent": 0,
+      "cover": "https://cdn.cloudflare.steamstatic.com/steam/apps/553850/header.jpg",
+      "images": ["https://cdn.cloudflare.steamstatic.com/steam/apps/553850/header.jpg"],
+      "description": "Cooperativo táctico con fuego amigo y objetivos dinámicos.",
+      "rating": 4.3, "platforms": ["Windows"] },
+
+    { "id": 6, "title": "Palworld", "price": 799.99, "discountPercent": 0,
+      "cover": "https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/header.jpg",
+      "images": ["https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/header.jpg"],
+      "description": "Supervivencia y captura de criaturas con crafteo y construcción.",
+      "rating": 4.1, "platforms": ["Windows"] }
+  ],
+  "reviews": [
+    { "id": 101, "gameId": 1, "user": "Ana",  "rating": 5, "date": "2024-09-01", "text": "Muy pulido en jugabilidad." },
+    { "id": 102, "gameId": 1, "user": "Pablo","rating": 4, "date": "2024-09-10", "text": "Competitivo y estable." },
+
+    { "id": 201, "gameId": 2, "user": "Sol",  "rating": 5, "date": "2024-08-05", "text": "Online infinito, clásico." },
+    { "id": 202, "gameId": 2, "user": "Luz",  "rating": 4, "date": "2024-08-15", "text": "Campaña tremenda." },
+
+    { "id": 301, "gameId": 3, "user": "Max",  "rating": 5, "date": "2024-07-20", "text": "Historia de las mejores." },
+    { "id": 302, "gameId": 3, "user": "Nico", "rating": 5, "date": "2024-07-28", "text": "Ambientación impecable." },
+
+    { "id": 401, "gameId": 4, "user": "Eli",  "rating": 4, "date": "2024-06-12", "text": "Muy bueno post-parches." },
+    { "id": 402, "gameId": 4, "user": "Tomi", "rating": 4, "date": "2024-06-18", "text": "Historia atrapante." },
+
+    { "id": 501, "gameId": 5, "user": "Gabi", "rating": 4, "date": "2024-05-02", "text": "Coop divertidísimo." },
+    { "id": 502, "gameId": 5, "user": "Ivo",  "rating": 3, "date": "2024-05-11", "text": "Difícil pero adictivo." },
+
+    { "id": 601, "gameId": 6, "user": "Vero", "rating": 4, "date": "2024-04-08", "text": "Engancha con amigos." },
+    { "id": 602, "gameId": 6, "user": "Luis", "rating": 3, "date": "2024-04-15", "text": "Rendimiento variable." }
+  ]
+}

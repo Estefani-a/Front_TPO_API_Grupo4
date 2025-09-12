@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./auth.css";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const steamLogo = "https://store.cloudflare.steamstatic.com/public/shared/images/header/logo_steam.svg?t=962016";
 const promoImage = "src/assets/promoImage.png";
@@ -46,20 +49,35 @@ const gamesList = [
 
 export default function Home() {
   const [cart, setCart] = useState([]);
-  const navigate = useNavigate();
+  // 1) cargar carrito guardado
+useEffect(() => {
+  try {
+    const raw = localStorage.getItem("cart");
+    if (raw) setCart(JSON.parse(raw));
+  } catch {}
+}, []);
 
-  const addToCart = (game) => {
-    if (!cart.find((item) => item.id === game.id)) {
-      setCart([...cart, game]);
-    }
-  };
+// 2) cada vez que cambie el carrito, guardarlo
+useEffect(() => {
+  try { localStorage.setItem("cart", JSON.stringify(cart)); } catch {}
+}, [cart]);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+
+function addToCart(game) {
+  setCart((prev) => (prev.find((i) => i.id === game.id) ? prev : [...prev, game]));
+}
+
 
   const removeFromCart = (id) => {
     setCart(cart.filter((item) => item.id !== id));
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
 
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  
   return (
     <div className="home-root">
       {/* Header */}
@@ -237,6 +255,11 @@ export default function Home() {
                   alignItems: "center",
                   gap: 16
                 }}>
+              <Link
+                        to={`/game/${game.id}`}
+                        state={{ game }}  
+                        style={{ display: "flex", alignItems: "center", gap: 16, textDecoration: "none" }}
+              >
                   <img
                     src={game.image}
                     alt={game.title}
@@ -268,6 +291,7 @@ export default function Home() {
                       ${game.price.toFixed(2)}
                     </div>
                   </div>
+              </Link>
                   <button
                     onClick={() => addToCart(game)}
                     disabled={cart.find((item) => item.id === game.id)}
