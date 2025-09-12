@@ -8,7 +8,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} /> {/* Home = Home con carrito */}
       <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} /> {/* Puedes agregar esta ruta */}
+      <Route path="/login" element={<Login />} /> 
     </Routes>
   );
 }
