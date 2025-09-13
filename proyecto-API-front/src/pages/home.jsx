@@ -208,17 +208,20 @@ export default function Home() {
                 }}>
                   Total: ${total.toFixed(2)}
                 </div>
-                <button style={{
-                  width: "100%",
-                  marginTop: 16,
-                  padding: "12px",
-                  background: "#66c0f4",
-                  color: "#171a21",
-                  border: "none",
-                  borderRadius: 4,
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}>
+                <button 
+                  onClick={() => navigate('/checkout', { state: { cart, total } })}
+                  style={{
+                    width: "100%",
+                    marginTop: 16,
+                    padding: "12px",
+                    background: "#66c0f4",
+                    color: "#171a21",
+                    border: "none",
+                    borderRadius: 4,
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
                   Comprar
                 </button>
               </div>

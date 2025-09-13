@@ -31,9 +31,11 @@ body {
 .container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Cambiado de center a flex-start */
   min-height: 100vh;
-  padding: 60px;
+  height: auto;
+  padding: 32px;
+  overflow-y: auto;
 }
 
 /* Tarjeta del formulario - TAMAÑO DESKTOP */
@@ -50,6 +52,10 @@ body {
   min-width: 450px;
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.18);
+  margin: 32px auto;
+  max-height: none;
+  overflow: visible;
+  position: relative;
 }
 
 /* Logo */
@@ -299,4 +305,135 @@ body {
   font-size: 12px;
   margin-top: auto;
   border-top: 1px solid #2d3544;
+}
+
+/* checkout */
+
+.checkout-summary {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* contenedor de checkout */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  height: auto;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+.form-card {
+  margin: 32px auto;
+  max-height: none;
+  overflow: visible;
+  position: relative;
+}
+
+/*formulario de checkout */
+form {
+  overflow: visible;
+  position: relative;
+}
+
+select {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #171a21; 
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+  color: rgba(255, 255, 255, 0.95);
+  appearance: none;
+  cursor: pointer;
+}
+
+/* Estilo para las opciones del select */
+select option {
+  background-color: #171a21; 
+  color: rgba(255, 255, 255, 0.95);
+  padding: 12px;
+}
+
+select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 0 0 3px rgba(255, 255, 255, 0.1),
+    0 8px 25px rgba(0, 0, 0, 0.15);
+  background: #171a21;
+}
+
+/* Estilos específicos para checkout */
+body {
+  overflow-x: hidden;
+}
+
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.form-card {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  min-height: min-content;
+  position: relative;
+  overflow-y: visible;
+  padding: 3rem 2rem;
+}
+
+.form-group {
+  position: relative;
+  z-index: 1;
+}
+
+select {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ajustes para el contenido que se expande */
+form {
+  position: relative;
+  z-index: 1;
+  height: auto;
+  min-height: min-content;
+}
+
+.checkout-summary {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
 }
