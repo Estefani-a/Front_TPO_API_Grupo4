@@ -59,9 +59,6 @@ body {
 }
 
 /* Logo */
-.logo {
-  margin-bottom: 2rem;
-}
 
 .logo-placeholder {
   font-size: 2.2rem;
@@ -69,6 +66,27 @@ body {
   color: rgba(255, 255, 255, 0.95);
   letter-spacing: 3px;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+.logo {
+  margin-bottom: 2rem; /* Mantiene el mismo margen que tenías para .logo-placeholder */
+  text-align: center;
+}
+
+.logo-image {
+  width: 120px;  /* Doble del tamaño anterior (60px × 2) */
+  height: 120px;
+  object-fit: contain; /* Mantiene las proporciones de la imagen */
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.3)); /* Misma sombra que el texto */
+}
+
+/* Opcional: Si quieres que sea un poco más grande en pantallas grandes */
+@media (min-width: 768px) {
+  .logo-image {
+    width: 140px;  /* Doble del tamaño anterior (70px × 2) */
+    height: 140px;
+  }
 }
 
 /* Título */

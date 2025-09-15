@@ -1,35 +1,55 @@
 import { Link } from "react-router-dom";
 import "./auth.css";
 
-export default function register() {
+export default function Register() { 
   return (
     <div className="container">
       <div className="form-card">
         <div className="logo">
-          <div className="logo-placeholder">LOGO</div>
+          <img src="/Steam_icon_logo.png" alt="Steam Logo" className="logo-image" />
         </div>
 
         <h2>Registrarse</h2>
 
         <form>
           <div className="form-group">
-            <label>Nombre</label>
-            <input type="text" placeholder="Tu nombre" />
+            <label htmlFor="name">Nombre</label>
+            <input 
+              id="name"
+              type="text" 
+              placeholder="Tu nombre" 
+              required
+            />
           </div>
 
           <div className="form-group">
-            <label>Email</label>
-            <input type="email" placeholder="correo@ejemplo.com" />
+            <label htmlFor="email">Email</label>
+            <input 
+              id="email"
+              type="email" 
+              placeholder="correo@ejemplo.com" 
+              required
+            />
           </div>
 
           <div className="form-group">
-            <label>Contraseña</label>
-            <input type="password" placeholder="********" />
+            <label htmlFor="password">Contraseña</label>
+            <input 
+              id="password"
+              type="password" 
+              placeholder="********" 
+              required
+            />
           </div>
 
           <div className="form-group">
-            <label>Confirmar Contraseña</label>
-            <input type="password" placeholder="********" />
+            <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+            <input 
+              id="confirmPassword"
+              type="password" 
+              placeholder="********" 
+              required
+            />
           </div>
 
           <button type="submit" className="btn">

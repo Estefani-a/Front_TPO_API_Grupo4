@@ -6,7 +6,7 @@ export default function Login() {
     <div className="container">
       <div className="form-card">
         <div className="logo">
-          <div className="logo-placeholder">LOGO</div>
+          <img src="/Steam_icon_logo.png" alt="Steam Logo" className="logo-image" />
         </div>
 
         <h2>Iniciar Sesión</h2>
