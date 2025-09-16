@@ -1,0 +1,39 @@
+.steam-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #171a21;
+  padding: 12px 32px;
+  color: #c7d5e0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  position: relative; 
+}
+
+.steam-search {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  background: #2a475e;
+  border-radius: 3px;
+  padding: 2px 8px;
+  min-width: 220px;
+  z-index: 1;
+}
+
+.steam-search input {
+  background: transparent;
+  border: none;
+  color: #c7d5e0;
+  padding: 6px;
+  outline: none;
+  width: 500px;
+}
+
+.steam-search button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+}
