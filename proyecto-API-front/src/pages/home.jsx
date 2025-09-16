@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./auth.css";
+import NavBar from "../components/NavBar";
 
 const steamLogo = "https://store.cloudflare.steamstatic.com/public/shared/images/header/logo_steam.svg?t=962016";
 const promoImage = "src/assets/promoImage.png";
@@ -44,7 +45,17 @@ const gamesList = [
   },
 ];
 
-export default function Home() {
+export default function Home({ search = "" }) {
+  const [input, setInput] = useState("");
+  const [foundGames, setFoundGames] = useState(gamesList);
+  const handleChange = (e) => {
+    setFoundGames(gamesList.filter(game =>
+      game.title.toLowerCase().includes(e.target.value.toLowerCase())
+    ));
+    setInput(e.target.value);
+    console.log("Juegos encontrados:", foundGames);
+  };
+
   const [cart, setCart] = useState([]);
   const navigate = useNavigate();
 
@@ -60,6 +71,9 @@ export default function Home() {
 
   const total = cart.reduce((sum, item) => sum + item.price, 0);
 
+  const filteredGames = gamesList.filter(game =>
+    game.title.toLowerCase().includes(search.toLowerCase())
+  );
   return (
     <div className="home-root">
       {/* Header */}
@@ -96,12 +110,12 @@ export default function Home() {
                 fontSize: 14,
                 fontWeight: 500,
               }}>TIENDA</a>
-              {/*<a href="#" style={{
+              <a href="#" style={{
                 color: "#c7d5e0",
                 textDecoration: "none",
                 fontSize: 14,
                 fontWeight: 500,
-              }}>BIBLIOTECA</a>*/}
+              }}>BIBLIOTECA</a>
             </nav>
           </div>
 
@@ -139,6 +153,8 @@ export default function Home() {
           }}
         />
       </div>
+
+      <NavBar handleChange={handleChange} input={input} />
 
       {/* Contenido principal */}
       <div style={{
@@ -208,7 +224,7 @@ export default function Home() {
                 }}>
                   Total: ${total.toFixed(2)}
                 </div>
-                <button 
+                <button
                   onClick={() => navigate('/checkout', { state: { cart, total } })}
                   style={{
                     width: "100%",
@@ -233,7 +249,7 @@ export default function Home() {
         <div style={{ flex: "2 1 600px" }}>
           <div className="featured-games-container">
             <h2 className="featured-title">Juegos destacados</h2>
-            {gamesList.map((game) => (
+            {foundGames.map((game) => (
               <div key={game.id} className="game-item">
                 <div style={{
                   display: "flex",
@@ -250,20 +266,20 @@ export default function Home() {
                       borderRadius: 4,
                     }}
                   />
-                  <div style={{ 
+                  <div style={{
                     flex: 1,
                     display: "flex",
                     flexDirection: "column",
                     gap: 8
                   }}>
-                    <div style={{ 
+                    <div style={{
                       color: "#fff",
                       fontSize: 18,
                       fontWeight: 500
                     }}>
                       {game.title}
                     </div>
-                    <div style={{ 
+                    <div style={{
                       color: "#66c0f4",
                       fontSize: 16,
                       fontWeight: 500
@@ -299,8 +315,8 @@ export default function Home() {
         </div>
       </div>
       <footer className="footer">
-      © 2025 Grupo 4. Todos los derechos reservados.
-    </footer>
+        © 2025 Grupo 4. Todos los derechos reservados.
+      </footer>
     </div>
   );
 }
