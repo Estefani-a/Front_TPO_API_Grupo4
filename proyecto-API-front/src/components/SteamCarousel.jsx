@@ -1,0 +1,198 @@
+import React, { useState, useEffect } from 'react';
+// Flecha SVG personalizada
+const ArrowIcon = ({ direction = 'right' }) => (
+  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d={direction === 'right' ? 'M12 8L26 19L12 30' : 'M26 8L12 19L26 30'} stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const featuredGames = [
+  {
+    id: 1,
+    title: "Counter-Strike 2",
+    price: 499.99,
+    tags: ["Shooter", "Multiplayer", "Táctico"],
+    mainImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg",
+    color: "linear-gradient(90deg, #ff9800 60%, #f44336 100%)"
+  },
+  {
+    id: 2,
+    title: "Grand Theft Auto V",
+    price: 899.99,
+    tags: ["Acción", "Mundo Abierto", "Crimen"],
+    mainImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg",
+    color: "linear-gradient(90deg, #00bcd4 60%, #9c27b0 100%)"
+  },
+  {
+    id: 3,
+    title: "Red Dead Redemption 2",
+    price: 1199.99,
+    tags: ["Aventura", "Mundo Abierto", "Western"],
+    mainImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/header.jpg",
+    color: "linear-gradient(90deg, #ffc107 60%, #ff9800 100%)"
+  },
+  {
+    id: 4,
+    title: "Cyberpunk 2077",
+    price: 999.99,
+    tags: ["RPG", "Futurista", "Acción"],
+    mainImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg",
+    color: "linear-gradient(90deg, #9c27b0 60%, #3f51b5 100%)"
+  },
+  {
+    id: 5,
+    title: "HELLDIVERS™ 2",
+    price: 1299.99,
+    tags: ["Cooperativo", "Acción", "Shooter"],
+    mainImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/553850/header.jpg",
+    color: "linear-gradient(90deg, #f44336 60%, #607d8b 100%)"
+  },
+  {
+    id: 6,
+    title: "Palworld",
+    price: 799.99,
+    tags: ["Criaturas", "Supervivencia", "Multijugador"],
+    mainImage: "https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/header.jpg",
+    color: "linear-gradient(90deg, #f44336 60%, #2196f3 100%)"
+  }
+];
+
+const SteamCarousel = ({ addToCart, cart }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % featuredGames.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + featuredGames.length) % featuredGames.length);
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentGame = featuredGames[currentSlide];
+
+  return (
+    <>
+      <div className="carousel-root" style={{ width: '100%', maxWidth: '1200px', margin: '32px auto', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.18)' }}>
+        <div style={{ position: 'relative', display: 'flex', background: '#23262e' }}>
+          {/* Main Image & Arrows */}
+          <div style={{ flex: 1, position: 'relative', minHeight: 400 }}>
+            <img src={currentGame.mainImage} alt={currentGame.title} style={{ width: '100%', height: 400, objectFit: 'cover', filter: 'brightness(0.85)' }} />
+            <button
+              onClick={prevSlide}
+              style={{
+                position: 'absolute',
+                left: 16,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                width: 38,
+                height: 38,
+                color: '#fff',
+                cursor: 'pointer',
+                zIndex: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ArrowIcon direction="left" />
+            </button>
+            <button
+              onClick={nextSlide}
+              style={{
+                position: 'absolute',
+                right: 16,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                width: 38,
+                height: 38,
+                color: '#fff',
+                cursor: 'pointer',
+                zIndex: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ArrowIcon direction="right" />
+            </button>
+            {/* Slide Indicators eliminados del interior */}
+          </div>
+          {/* Sidebar */}
+          <div style={{ width: 340, background: '#23262e', padding: '32px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <h2 style={{ color: '#66c0f4', fontSize: 28, fontWeight: 700, marginBottom: 12 }}>{currentGame.title}</h2>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'nowrap', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+              {currentGame.tags.map((tag, idx) => (
+                <span key={idx} style={{ background: '#2a475e', color: '#c7d5e0', borderRadius: 12, padding: '4px 12px', fontSize: 13, whiteSpace: 'nowrap' }}>{tag}</span>
+              ))}
+            </div>
+            <div style={{ marginBottom: 16, color: '#c7d5e0', fontSize: 15 }}>{currentGame.description}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              {currentGame.discount && <span style={{ background: '#66c0f4', color: '#171a21', borderRadius: 6, padding: '2px 8px', fontWeight: 700 }}>{currentGame.discount}</span>}
+              {currentGame.originalPrice && <span style={{ color: '#acb4bd', textDecoration: 'line-through', fontSize: 15 }}>{currentGame.originalPrice}</span>}
+              <span style={{ color: '#66c0f4', fontWeight: 700, fontSize: 20 }}>{currentGame.price}</span>
+            </div>
+            <button
+              onClick={() => addToCart(currentGame)}
+              disabled={cart && cart.find((item) => item.id === currentGame.id)}
+              style={{
+                background: cart && cart.find((item) => item.id === currentGame.id)
+                  ? '#4b6479'
+                  : 'linear-gradient(90deg, #66c0f4 0%, #417a9b 100%)',
+                color: cart && cart.find((item) => item.id === currentGame.id)
+                  ? '#acb4bd'
+                  : '#171a21',
+                border: 'none',
+                borderRadius: 6,
+                padding: '10px 0',
+                fontWeight: 700,
+                fontSize: 16,
+                cursor: cart && cart.find((item) => item.id === currentGame.id) ? 'not-allowed' : 'pointer',
+                marginBottom: 8,
+              }}
+            >
+              {cart && cart.find((item) => item.id === currentGame.id) ? 'Agregado' : 'Agregar al carrito'}
+            </button>
+            
+            {/* Screenshots eliminados */}
+          </div>
+        </div>
+      </div>
+      {/* Indicadores debajo del carrusel */}
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 12, marginTop: 18 }}>
+        {featuredGames.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => goToSlide(idx)}
+            style={{
+              width: 32,
+              height: 14,
+              borderRadius: 4,
+              background: idx === currentSlide ? '#6e6e6eff' : '#2f333dff',
+              opacity: idx === currentSlide ? 1 : 0.7,
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+            }}
+          />
+        ))}
+      </div>
+    </>
+  );
+
+}
+export default SteamCarousel;
