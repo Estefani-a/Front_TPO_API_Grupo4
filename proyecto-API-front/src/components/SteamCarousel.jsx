@@ -144,7 +144,7 @@ const SteamCarousel = ({ addToCart, cart }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
               {currentGame.discount && <span style={{ background: '#66c0f4', color: '#171a21', borderRadius: 6, padding: '2px 8px', fontWeight: 700 }}>{currentGame.discount}</span>}
               {currentGame.originalPrice && <span style={{ color: '#acb4bd', textDecoration: 'line-through', fontSize: 15 }}>{currentGame.originalPrice}</span>}
-              <span style={{ color: '#66c0f4', fontWeight: 700, fontSize: 20 }}>{currentGame.price}</span>
+              <span style={{ color: '#66c0f4', fontWeight: 700, fontSize: 20 }}>$ {currentGame.price}</span>
             </div>
             <button
               onClick={() => addToCart(currentGame)}

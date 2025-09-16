@@ -64,7 +64,11 @@ export default function Home({ search = "" }) {
 
   const addToCart = (game) => {
     if (!cart.find((item) => item.id === game.id)) {
-      setCart([...cart, game]);
+      const gameWithImage = {
+        ...game,
+        image: game.image || game.mainImage
+      };
+      setCart([...cart, gameWithImage]);
     }
   };
 
