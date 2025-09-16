@@ -79,66 +79,7 @@ export default function Home({ search = "" }) {
   );
 
   return (
-    <div className="home-root">
-      {/* Header */}
-      <div style={{
-        width: "100%",
-        background: "#171a21",
-        borderBottom: "1px solid #2d3544",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-      }}>
-        <div style={{
-          maxWidth: "1600px",
-          margin: "0 auto",
-          padding: "0 24px",
-          height: 60,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}>
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 24,
-          }}>
-            <img src={steamLogo} alt="Steam" style={{ height: 36 }} />
-            <nav style={{
-              display: "flex",
-              gap: 24,
-            }}>
-              <a href="#" style={{
-                color: "#c7d5e0",
-                textDecoration: "none",
-                fontSize: 14,
-                fontWeight: 500,
-              }}>TIENDA</a>
-              <a href="#" style={{
-                color: "#c7d5e0",
-                textDecoration: "none",
-                fontSize: 14,
-                fontWeight: 500,
-              }}>BIBLIOTECA</a>
-            </nav>
-          </div>
-
-          <button
-            onClick={() => navigate("/login")}
-            style={{
-              background: "linear-gradient(90deg, #3a9aed 0%, #2179c7 100%)",
-              color: "#fff",
-              border: "none",
-              borderRadius: 2,
-              padding: "8px 20px",
-              fontSize: 13,
-              cursor: "pointer",
-            }}
-          >
-            Iniciar sesión
-          </button>
-        </div>
-      </div>
+    <div className="home-root" style={{ marginTop: 60 }}>
 
       {/* NavBar tipo Steam */}
       <NavBar handleChange={handleChange} input={input} onCartClick={() => setShowCart(true)} cartCount={cart.length} />
