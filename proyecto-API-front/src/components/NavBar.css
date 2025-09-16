@@ -1,37 +1,122 @@
+.cart-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(23,26,33,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.cart-popup {
+  background: #23262e;
+  border-radius: 10px;
+  padding: 32px 28px 24px 28px;
+  min-width: 340px;
+  max-width: 90vw;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  color: #fff;
+  position: relative;
+}
+.cart-btn {
+  background: #2a475e;
+  color: #c7d5e0;
+  border: none;
+  border-radius: 50px;
+  font-size: 22px;
+  margin-left: 18px;
+  padding: 6px 16px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s;
+}
+.cart-btn:hover {
+  background: #66c0f4;
+  color: #171a21;
+}
+.cart-count {
+  background: #c1272d;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 2px 7px;
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 22px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+/* Steam-style navbar */
 .steam-navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #171a21;
-  padding: 12px 32px;
+  background: linear-gradient(90deg, #171a21 60%, #2a475e 100%);
   color: #c7d5e0;
   font-family: 'Segoe UI', Arial, sans-serif;
-  position: relative; 
+  padding: 18px 48px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  max-width: 1200px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.steam-search {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+.navbar-left {
+  display: flex;
+  gap: 32px;
+}
+
+.navbar-link {
+  color: #c7d5e0;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+  padding: 2px 8px;
+}
+.navbar-link:hover {
+  color: #fff;
+  text-shadow: 0 0 8px #66c0f4;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-search {
   display: flex;
   align-items: center;
   background: #2a475e;
   border-radius: 3px;
-  padding: 2px 8px;
+  padding: 2px 10px;
   min-width: 220px;
-  z-index: 1;
+  max-width: 350px;
+  width: 100%;
 }
 
-.steam-search input {
+.navbar-search input {
   background: transparent;
   border: none;
   color: #c7d5e0;
   padding: 6px;
   outline: none;
-  width: 500px;
+  width: 180px;
+  font-size: 15px;
 }
 
-.steam-search button {
+.navbar-search button {
   background: none;
   border: none;
   cursor: pointer;
