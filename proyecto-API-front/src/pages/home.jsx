@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
 import "./auth.css";
 import NavBar from "../components/NavBar";
+import SteamCarousel from "../components/SteamCarousel";
 
 const steamLogo = "https://store.cloudflare.steamstatic.com/public/shared/images/header/logo_steam.svg?t=962016";
 const promoImage = "src/assets/promoImage.png";
@@ -57,6 +59,7 @@ export default function Home({ search = "" }) {
   };
 
   const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
   const navigate = useNavigate();
 
   const addToCart = (game) => {
@@ -74,6 +77,7 @@ export default function Home({ search = "" }) {
   const filteredGames = gamesList.filter(game =>
     game.title.toLowerCase().includes(search.toLowerCase())
   );
+
   return (
     <div className="home-root">
       {/* Header */}
@@ -136,42 +140,16 @@ export default function Home({ search = "" }) {
         </div>
       </div>
 
-      {/* Banner */}
-      <div style={{
-        width: "100%",
-        maxHeight: 320,
-        overflow: "hidden",
-        position: "relative",
-      }}>
-        <img
-          src={promoImage}
-          alt="World of Tanks"
-          style={{
-            width: "100%",
-            height: "auto",
-            display: "block",
-          }}
-        />
-      </div>
+      {/* NavBar tipo Steam */}
+      <NavBar handleChange={handleChange} input={input} onCartClick={() => setShowCart(true)} cartCount={cart.length} />
 
-      <NavBar handleChange={handleChange} input={input} />
+      {/* Carrusel Steam */}
+  <SteamCarousel addToCart={addToCart} cart={cart} />
 
-      {/* Contenido principal */}
-      <div style={{
-        maxWidth: "1600px",
-        margin: "32px auto",
-        padding: "0 24px",
-        display: "flex",
-        gap: 32,
-        flexWrap: "wrap",
-      }}>
-        {/* Carrito */}
-        <div style={{ flex: "1 1 300px", minWidth: 300 }}>
-          <div className="auth-container" style={{
-            background: "rgba(23,26,33,0.98)",
-            padding: "24px",
-            borderRadius: "4px",
-          }}>
+      {/* Popup Carrito */}
+      {showCart && (
+        <div className="cart-popup-overlay" onClick={() => setShowCart(false)}>
+          <div className="cart-popup" onClick={e => e.stopPropagation()}>
             <h2 style={{ color: "#66c0f4", marginBottom: 24 }}>Tu carrito</h2>
             {cart.length === 0 ? (
               <div style={{ color: "#fff" }}>Tu carrito está vacío.</div>
@@ -242,76 +220,99 @@ export default function Home({ search = "" }) {
                 </button>
               </div>
             )}
+            <button
+              onClick={() => setShowCart(false)}
+              style={{
+                marginTop: 18,
+                background: "#2a475e",
+                color: "#fff",
+                border: "none",
+                borderRadius: 4,
+                padding: "8px 20px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              Cerrar
+            </button>
           </div>
         </div>
+      )}
 
-        {/* Lista de juegos */}
-        <div style={{ flex: "2 1 600px" }}>
-          <div className="featured-games-container">
-            <h2 className="featured-title">Juegos destacados</h2>
-            {foundGames.map((game) => (
-              <div key={game.id} className="game-item">
+      {/* Lista de juegos centrada */}
+      <div style={{
+        maxWidth: "1200px",
+        margin: "32px auto",
+        padding: "0 24px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}>
+        <div className="featured-games-container" style={{ width: "100%" }}>
+          <h2 className="featured-title">Juegos destacados</h2>
+          {foundGames.map((game) => (
+            <div key={game.id} className="game-item">
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                justifyContent: "center"
+              }}>
+                <img
+                  src={game.image}
+                  alt={game.title}
+                  style={{
+                    width: 184,
+                    height: 69,
+                    objectFit: "cover",
+                    borderRadius: 4,
+                  }}
+                />
                 <div style={{
+                  flex: 1,
                   display: "flex",
-                  alignItems: "center",
-                  gap: 16
+                  flexDirection: "column",
+                  gap: 8
                 }}>
-                  <img
-                    src={game.image}
-                    alt={game.title}
-                    style={{
-                      width: 184,
-                      height: 69,
-                      objectFit: "cover",
-                      borderRadius: 4,
-                    }}
-                  />
                   <div style={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 8
+                    color: "#fff",
+                    fontSize: 18,
+                    fontWeight: 500
                   }}>
-                    <div style={{
-                      color: "#fff",
-                      fontSize: 18,
-                      fontWeight: 500
-                    }}>
-                      {game.title}
-                    </div>
-                    <div style={{
-                      color: "#66c0f4",
-                      fontSize: 16,
-                      fontWeight: 500
-                    }}>
-                      ${game.price.toFixed(2)}
-                    </div>
+                    {game.title}
                   </div>
-                  <button
-                    onClick={() => addToCart(game)}
-                    disabled={cart.find((item) => item.id === game.id)}
-                    style={{
-                      background: cart.find((item) => item.id === game.id)
-                        ? "#4b6479"
-                        : "linear-gradient(90deg, #66c0f4 0%, #417a9b 100%)",
-                      color: cart.find((item) => item.id === game.id)
-                        ? "#acb4bd"
-                        : "#171a21",
-                      border: "none",
-                      borderRadius: 4,
-                      padding: "10px 20px",
-                      cursor: "pointer",
-                      fontWeight: "500",
-                      transition: "all 0.2s ease",
-                      minWidth: 100,
-                    }}
-                  >
-                    {cart.find((item) => item.id === game.id) ? "Agregado" : "Agregar"}
-                  </button>
+                  <div style={{
+                    color: "#66c0f4",
+                    fontSize: 16,
+                    fontWeight: 500
+                  }}>
+                    ${game.price.toFixed(2)}
+                  </div>
                 </div>
+                <button
+                  onClick={() => addToCart(game)}
+                  disabled={cart.find((item) => item.id === game.id)}
+                  style={{
+                    background: cart.find((item) => item.id === game.id)
+                      ? "#4b6479"
+                      : "linear-gradient(90deg, #66c0f4 0%, #417a9b 100%)",
+                    color: cart.find((item) => item.id === game.id)
+                      ? "#acb4bd"
+                      : "#171a21",
+                    border: "none",
+                    borderRadius: 4,
+                    padding: "10px 20px",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                    transition: "all 0.2s ease",
+                    minWidth: 100,
+                  }}
+                >
+                  {cart.find((item) => item.id === game.id) ? "Agregado" : "Agregar"}
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
       <footer className="footer">
