@@ -123,6 +123,8 @@ export default function Home({ search = "" }) {
       const raw = localStorage.getItem("cart");
       const current = raw ? JSON.parse(raw) : [];
       const i = current.findIndex((x) => x.id === game.id);
+      // Asegura que la imagen esté correctamente asignada
+      const image = game.image || game.mainImage;
       if (i >= 0) {
         current[i] = { ...current[i], qty: (current[i].qty || 1) + 1 };
       } else {
@@ -130,7 +132,7 @@ export default function Home({ search = "" }) {
           id: game.id,
           title: game.title,
           price: game.price,
-          image: game.image,
+          image,
           qty: 1,
         });
       }
@@ -142,14 +144,6 @@ export default function Home({ search = "" }) {
       setTimeout(() => setToast(""), 2500);
     } catch (e) {
       console.error(e);
-
-    if (!cart.find((item) => item.id === game.id)) {
-      const gameWithImage = {
-        ...game,
-        image: game.image || game.mainImage
-      };
-      setCart([...cart, gameWithImage]);
-
     }
   };
 
@@ -379,21 +373,27 @@ export default function Home({ search = "" }) {
                   </div>
                 </div>
 
+                {/* Botón dinámico según si está en el carrito */}
                 <button
                   onClick={() => addToCart(game)}
+                  disabled={cart.find((item) => item.id === game.id)}
                   style={{
-                    background: "linear-gradient(90deg, #66c0f4 0%, #417a9b 100%)",
-                    color: "#171a21",
-                    border: "none",
+                    background: cart.find((item) => item.id === game.id)
+                      ? '#4b6479'
+                      : 'linear-gradient(90deg, #66c0f4 0%, #417a9b 100%)',
+                    color: cart.find((item) => item.id === game.id)
+                      ? '#acb4bd'
+                      : '#171a21',
+                    border: 'none',
                     borderRadius: 4,
-                    padding: "10px 20px",
-                    cursor: "pointer",
-                    fontWeight: "500",
-                    transition: "all 0.2s ease",
+                    padding: '10px 20px',
+                    cursor: cart.find((item) => item.id === game.id) ? 'not-allowed' : 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease',
                     minWidth: 110,
                   }}
                 >
-                  Agregar
+                  {cart.find((item) => item.id === game.id) ? 'Agregado' : 'Agregar al carrito'}
                 </button>
               </div>
             </div>

@@ -33,6 +33,28 @@ export default function GameDetail() {
   // Tabs
   const [activeTab, setActiveTab] = useState("desc"); 
 
+  const [cart, setCart] = useState([]);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("cart");
+      setCart(raw ? JSON.parse(raw) : []);
+    } catch {
+      setCart([]);
+    }
+    const reloadCart = () => {
+      try {
+        const raw = localStorage.getItem("cart");
+        setCart(raw ? JSON.parse(raw) : []);
+      } catch {}
+    };
+    window.addEventListener("cart-updated", reloadCart);
+    window.addEventListener("focus", reloadCart);
+    return () => {
+      window.removeEventListener("cart-updated", reloadCart);
+      window.removeEventListener("focus", reloadCart);
+    };
+  }, []);
+
   const addToCart = () => {
     if (!game) return;
     try {
@@ -175,8 +197,23 @@ export default function GameDetail() {
             </div>
 
             <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-              <button className="btn" onClick={addToCart}>
-                Agregar al carrito
+              <button
+                className="btn"
+                onClick={addToCart}
+                disabled={cart.find((item) => item.id === game.id)}
+                style={{
+                  background: cart.find((item) => item.id === game.id)
+                    ? '#4b6479'
+                    : undefined,
+                  color: cart.find((item) => item.id === game.id)
+                    ? '#acb4bd'
+                    : undefined,
+                  cursor: cart.find((item) => item.id === game.id)
+                    ? 'not-allowed'
+                    : undefined,
+                }}
+              >
+                {cart.find((item) => item.id === game.id) ? 'Agregado' : 'Agregar al carrito'}
               </button>
               <button
                 className="btn"
