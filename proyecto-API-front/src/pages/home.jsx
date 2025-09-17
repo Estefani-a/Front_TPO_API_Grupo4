@@ -13,8 +13,9 @@ const gamesList = [
     title: "Counter-Strike 2",
     price: 499.99,
     image: "https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg",
-    description: "Shooter competitivo 5v5 con enfoque en precisión y trabajo en equipo.",
+  description: "Shooter competitivo 5v5 con enfoque en precisión y trabajo en equipo. Counter-Strike 2 es la evolución del clásico FPS, con físicas mejoradas, nuevos mapas y una comunidad activa. Domina el arte de la puntería y la estrategia en partidas intensas y torneos mundiales.",
     images: ["https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg"],
+    tags: ["Shooter", "Multiplayer", "Táctico"],
     reviews: [
       { id: "r1", user: "Santi", rating: 4.8, date: "2025-08-01", text: "Muy sólido en ranked." },
       { id: "r2", user: "Vale",  rating: 4.6, date: "2025-08-06", text: "Requiere práctica pero vale la pena." },
@@ -25,8 +26,9 @@ const gamesList = [
     title: "Grand Theft Auto V",
     price: 899.99,
     image: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg",
-    description: "Mundo abierto con historia cinematográfica y online inmenso.",
+  description: "Mundo abierto con historia cinematográfica y online inmenso. Grand Theft Auto V te lleva a Los Santos, una ciudad vibrante llena de posibilidades, misiones, y caos. Vive la historia de tres protagonistas y explora el modo online con amigos en actividades ilimitadas.",
     images: ["https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg"],
+    tags: ["Acción", "Mundo Abierto", "Crimen"],
     reviews: [{ id: "r3", user: "Nico", rating: 5, date: "2025-07-20", text: "La historia es 10/10." }],
   },
   {
@@ -34,8 +36,9 @@ const gamesList = [
     title: "Red Dead Redemption 2",
     price: 1199.99,
     image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/header.jpg",
-    description: "Aventura épica en el Lejano Oeste con un mundo vivo y detallado.",
+  description: "Aventura épica en el Lejano Oeste con un mundo vivo y detallado. Red Dead Redemption 2 te sumerge en la vida de Arthur Morgan, enfrentando decisiones morales, paisajes impresionantes y una narrativa profunda. Caza, explora y sobrevive en el salvaje oeste.",
     images: ["https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/header.jpg"],
+    tags: ["Aventura", "Mundo Abierto", "Western"],
     reviews: [],
   },
   {
@@ -43,8 +46,9 @@ const gamesList = [
     title: "Cyberpunk 2077",
     price: 999.99,
     image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg",
-    description: "RPG futurista en Night City con decisiones que importan.",
+  description: "RPG futurista en Night City con decisiones que importan. Cyberpunk 2077 ofrece una ciudad vibrante, personajes complejos y una historia ramificada. Personaliza tu personaje, hackea sistemas y descubre secretos en un mundo de alta tecnología y peligro.",
     images: ["https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"],
+    tags: ["RPG", "Futurista", "Acción"],
     reviews: [],
   },
   {
@@ -52,8 +56,9 @@ const gamesList = [
     title: "HELLDIVERS™ 2",
     price: 1299.99,
     image: "https://cdn.cloudflare.steamstatic.com/steam/apps/553850/header.jpg",
-    description: "Acción cooperativa frenética con fuego amigo siempre activo.",
+  description: "Acción cooperativa frenética con fuego amigo siempre activo. HELLDIVERS™ 2 te desafía a trabajar en equipo para salvar la galaxia, enfrentando hordas alienígenas y peligros constantes. Coordina estrategias y sobrevive en misiones intensas.",
     images: ["https://cdn.cloudflare.steamstatic.com/steam/apps/553850/header.jpg"],
+    tags: ["Cooperativo", "Acción", "Shooter"],
     reviews: [],
   },
   {
@@ -61,8 +66,9 @@ const gamesList = [
     title: "Palworld",
     price: 799.99,
     image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/header.jpg",
-    description: "Captura, cría y combate con criaturas en mundo abierto.",
+  description: "Captura, cría y combate con criaturas en mundo abierto. Palworld combina exploración, supervivencia y gestión de criaturas únicas llamadas Pals. Construye, lucha y descubre secretos en un universo lleno de aventuras y desafíos.",
     images: ["https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/header.jpg"],
+    tags: ["Criaturas", "Supervivencia", "Multijugador"],
     reviews: [],
   },
 ];
@@ -70,18 +76,51 @@ const gamesList = [
 export default function Home({ search = "" }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdmin = typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true';
+
+  // Obtener juegos agregados por el admin
+  const getCustomGames = () => {
+    try {
+      const raw = localStorage.getItem('customGames');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  // Unir lista original y custom
+  const [removedIds, setRemovedIds] = useState([]);
+  const getAllGames = React.useCallback(() => {
+    // Filtra los juegos hardcodeados borrados temporalmente
+    const filteredHardcoded = gamesList.filter(g => !removedIds.includes(g.id));
+    return [...filteredHardcoded, ...getCustomGames().filter(g => !removedIds.includes(g.id))];
+  }, [removedIds]);
 
   // ===== búsqueda =====
   const [input, setInput] = useState("");
-  const [foundGames, setFoundGames] = useState(gamesList);
+  const [foundGames, setFoundGames] = useState(getAllGames());
+  const [tagFilter, setTagFilter] = useState("");
   const handleChange = (e) => {
     const value = e.target.value;
     setInput(value);
-    const filtered = gamesList.filter((g) =>
-      g.title.toLowerCase().includes(value.toLowerCase())
+    const filtered = getAllGames().filter((g) =>
+      g.title.toLowerCase().includes(value.toLowerCase()) &&
+      (tagFilter ? g.tags?.includes(tagFilter) : true)
     );
     setFoundGames(filtered);
   };
+
+  const handleTagFilter = (tag) => {
+    setTagFilter(tag);
+    setInput("");
+    const filtered = getAllGames().filter((g) => g.tags?.includes(tag));
+    setFoundGames(filtered);
+  };
+
+  // Actualizar la lista de juegos cuando removedIds cambie
+  useEffect(() => {
+    setFoundGames(getAllGames());
+  }, [removedIds, getAllGames]);
 
   // ===== carrito =====
   const [cart, setCart] = useState([]);
@@ -95,6 +134,8 @@ export default function Home({ search = "" }) {
     } catch {
       setCart([]);
     }
+    // Actualizar lista de juegos si se agregan nuevos
+    setFoundGames(getAllGames());
   }, []);
   useEffect(() => {
     const reloadCart = () => {
@@ -103,11 +144,16 @@ export default function Home({ search = "" }) {
         setCart(raw ? JSON.parse(raw) : []);
       } catch {}
     };
+    const reloadGames = () => {
+      setFoundGames(getAllGames());
+    };
     window.addEventListener("cart-updated", reloadCart);
     window.addEventListener("focus", reloadCart);
+    window.addEventListener("customGames-updated", reloadGames);
     return () => {
       window.removeEventListener("cart-updated", reloadCart);
       window.removeEventListener("focus", reloadCart);
+      window.removeEventListener("customGames-updated", reloadGames);
     };
   }, []);
 
@@ -206,11 +252,12 @@ export default function Home({ search = "" }) {
         input={input}
         onCartClick={() => setShowCart(true)}
         cartCount={cart.length}
+        onTagFilter={handleTagFilter}
       />
 
       {/* Carrusel (si lo usan) */}
       {typeof SteamCarousel === "function" && (
-        <SteamCarousel addToCart={addToCart} cart={cart} />
+          <SteamCarousel addToCart={addToCart} cart={cart} navigate={navigate} />
       )}
 
       {/* Popup Carrito */}
@@ -328,6 +375,16 @@ export default function Home({ search = "" }) {
       >
         <div className="featured-games-container" style={{ width: "100%" }}>
           <h2 className="featured-title">Juegos destacados</h2>
+          {tagFilter && (
+            <div style={{ marginBottom: 16 }}>
+              <span style={{ background: '#2a475e', color: '#c7d5e0', borderRadius: 12, padding: '4px 14px', fontSize: 14, fontWeight: 500 }}>
+                Filtrando por: {tagFilter}
+              </span>
+              <button onClick={() => { setTagFilter(""); setFoundGames(gamesList); }} style={{ marginLeft: 12, background: '#c1272d', color: '#fff', border: 'none', borderRadius: 8, padding: '2px 10px', cursor: 'pointer', fontSize: 13 }}>
+                Quitar filtro
+              </button>
+            </div>
+          )}
 
           {finalList.map((game) => (
             <div key={game.id} className="game-item">
@@ -368,6 +425,11 @@ export default function Home({ search = "" }) {
                   <div style={{ color: "#fff", fontSize: 18, fontWeight: 500 }}>
                     {game.title}
                   </div>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                    {game.tags?.slice(0, 3).map((tag, idx) => (
+                      <span key={idx} style={{ background: '#2a475e', color: '#c7d5e0', borderRadius: 12, padding: '2px 10px', fontSize: 13 }}>{tag}</span>
+                    ))}
+                  </div>
                   <div style={{ color: "#66c0f4", fontSize: 16, fontWeight: 500 }}>
                     ${game.price.toFixed(2)}
                   </div>
@@ -395,6 +457,35 @@ export default function Home({ search = "" }) {
                 >
                   {cart.find((item) => item.id === game.id) ? 'Agregado' : 'Agregar al carrito'}
                 </button>
+                {/* Botón borrar solo para admin */}
+                {isAdmin && (
+                  <button
+                    onClick={() => {
+                      // Si es custom, borrar de localStorage
+                      const customGames = getCustomGames();
+                      if (customGames.find(g => g.id === game.id)) {
+                        const updated = customGames.filter(g => g.id !== game.id);
+                        localStorage.setItem('customGames', JSON.stringify(updated));
+                        window.dispatchEvent(new CustomEvent('customGames-updated'));
+                      } else {
+                        // Si es hardcodeado, solo ocultar en la sesión
+                        setRemovedIds(ids => [...ids, game.id]);
+                      }
+                    }}
+                    style={{
+                      background: '#c1272d',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 4,
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      marginLeft: 8,
+                    }}
+                  >
+                    Borrar
+                  </button>
+                )}
               </div>
             </div>
           ))}

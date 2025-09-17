@@ -2,6 +2,20 @@ import { Link } from "react-router-dom";
 import "./auth.css";
 
 export default function Login() {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const email = e.target.email.value.toLowerCase();
+    const password = e.target.password.value;
+    // Permitir acceso admin con email admin@admin y password admin
+    if (email === "admin@admin" && password === "admin") {
+      localStorage.setItem("isAdmin", "true");
+      window.location.href = "/";
+      return;
+    }
+    // Si quieres agregar lógica para otros usuarios, aquí
+    alert("Credenciales incorrectas");
+  };
+
   return (
     <div className="container">
       <div className="form-card">
@@ -11,11 +25,12 @@ export default function Login() {
 
         <h2>Iniciar Sesión</h2>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input 
               id="email"
+              name="email"
               type="email" 
               placeholder="correo@ejemplo.com" 
               required
@@ -26,6 +41,7 @@ export default function Login() {
             <label htmlFor="password">Contraseña</label>
             <input 
               id="password"
+              name="password"
               type="password" 
               placeholder="••••••••" 
               required

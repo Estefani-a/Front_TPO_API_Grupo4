@@ -89,9 +89,11 @@ export default function GameDetail() {
           <p style={{ color: "rgba(255,255,255,.85)" }}>
             Entrá desde el Home para ver el detalle.
           </p>
-          <button className="btn" onClick={() => navigate("/")}>
+          <button className="btn" onClick={() => navigate("/")}> 
             Volver al Home
           </button>
+          {/* Si existiera un botón que diga TIENDA, lo haría navegar a home así: */}
+          {/* <button className="btn" onClick={() => navigate("/")}>TIENDA</button> */}
         </div>
       </div>
     );
@@ -250,15 +252,14 @@ export default function GameDetail() {
 
           {/* Contenido de tabs */}
           {activeTab === "desc" ? (
-            <p
-              style={{
-                color: "rgba(255,255,255,.92)",
-                lineHeight: 1.6,
-                marginTop: 10,
-              }}
-            >
+            <div style={{ color: "rgba(255,255,255,.92)", lineHeight: 1.6, marginTop: 10 }}>
               {game.description || "Sin descripción disponible."}
-            </p>
+              <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+                {game.tags?.map((tag, idx) => (
+                  <span key={idx} style={{ background: '#2a475e', color: '#c7d5e0', borderRadius: 12, padding: '2px 10px', fontSize: 13 }}>{tag}</span>
+                ))}
+              </div>
+            </div>
           ) : (
             <div style={{ marginTop: 10 }}>
               {(game.reviews || []).length === 0 && (
