@@ -142,6 +142,14 @@ export default function Home({ search = "" }) {
       setTimeout(() => setToast(""), 2500);
     } catch (e) {
       console.error(e);
+
+    if (!cart.find((item) => item.id === game.id)) {
+      const gameWithImage = {
+        ...game,
+        image: game.image || game.mainImage
+      };
+      setCart([...cart, gameWithImage]);
+
     }
   };
 
