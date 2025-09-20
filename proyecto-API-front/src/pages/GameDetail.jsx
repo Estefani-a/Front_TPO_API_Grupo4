@@ -1,28 +1,20 @@
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import "./GameDetail.css";
 
 export default function GameDetail() {
   const { state } = useLocation();
   const navigate = useNavigate();
-
- 
   const game = state?.game || null;
 
   useEffect(() => {
     const body = document.body;
     const prevStyle = body.getAttribute("style") || "";
-    body.setAttribute(
-      "style",
-      `
-        background: transparent !important;
-        animation: none !important;
-      `.trim()
-    );
+    body.setAttribute("style", "background: transparent !important; animation: none !important;");
     return () => {
       body.setAttribute("style", prevStyle);
     };
   }, []);
-
 
   const imgs = useMemo(() => {
     if (!game) return [];
@@ -30,10 +22,9 @@ export default function GameDetail() {
     return game.image ? [game.image] : [];
   }, [game]);
 
-  // Tabs
-  const [activeTab, setActiveTab] = useState("desc"); 
-
+  const [activeTab, setActiveTab] = useState("desc");
   const [cart, setCart] = useState([]);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem("cart");
@@ -41,12 +32,14 @@ export default function GameDetail() {
     } catch {
       setCart([]);
     }
+
     const reloadCart = () => {
       try {
         const raw = localStorage.getItem("cart");
         setCart(raw ? JSON.parse(raw) : []);
       } catch {}
     };
+
     window.addEventListener("cart-updated", reloadCart);
     window.addEventListener("focus", reloadCart);
     return () => {
@@ -83,17 +76,13 @@ export default function GameDetail() {
 
   if (!game) {
     return (
-      <div className="container" style={{ paddingTop: 80 }}>
-        <div className="form-card" style={{ textAlign: "center" }}>
-          <h2 style={{ color: "#fff" }}>No se encontró el juego</h2>
-          <p style={{ color: "rgba(255,255,255,.85)" }}>
-            Entrá desde el Home para ver el detalle.
-          </p>
-          <button className="btn" onClick={() => navigate("/")}> 
+      <div className="container no-game">
+        <div className="form-card">
+          <h2>No se encontró el juego</h2>
+          <p>Entrá desde el Home para ver el detalle.</p>
+          <button className="btn" onClick={() => navigate("/")}>
             Volver al Home
           </button>
-          {/* Si existiera un botón que diga TIENDA, lo haría navegar a home así: */}
-          {/* <button className="btn" onClick={() => navigate("/")}>TIENDA</button> */}
         </div>
       </div>
     );
@@ -103,119 +92,36 @@ export default function GameDetail() {
 
   return (
     <>
-      {/* Fondo animado SOLO para GameDetail */}
-      <style>{`
-        @keyframes gdGradientMove {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .gd-bg-animated {
-          position: fixed;
-          inset: 0;
-          z-index: -1;
-          background: linear-gradient(-45deg, #04addc, #89dcf0, #2a454a, #0a5891, #142a3a);
-          background-size: 400% 400%;
-          animation: gdGradientMove 15s ease infinite;
-        }
-        .gd-tab {
-          border: 0;
-          background: transparent;
-          padding: 6px 0;
-          color: rgba(255,255,255,.9);
-          font-weight: 600;
-          cursor: pointer;
-        }
-        .gd-tab--active {
-          border-bottom: 2px solid #fff;
-          color: #fff;
-        }
-      `}</style>
       <div className="gd-bg-animated" />
-
-      <div className="container" style={{ paddingTop: 80, background: "transparent" }}>
-        <div
-          className="form-card"
-          style={{
-            width: 980,
-            maxWidth: "95%",
-            textAlign: "left",
-            background: "rgba(255,255,255,0.10)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.18)",
-            borderRadius: 25,
-          }}
-        >
+      <div className="container game-detail">
+        <div className="form-card">
           {/* Título */}
-          <div className="logo" style={{ marginBottom: 16 }}>
+          <div className="logo">
             <div className="logo-placeholder">{game.title}</div>
           </div>
 
           {/* Portada */}
-          <div
-            style={{
-              width: "100%",
-              aspectRatio: "16/9",
-              background: "rgba(0,0,0,.35)",
-              borderRadius: 16,
-              overflow: "hidden",
-            }}
-          >
+          <div className="cover-image">
             {imgs[0] ? (
-              <img
-                src={imgs[0]}
-                alt="cover"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+              <img src={imgs[0]} alt="cover" />
             ) : (
-              <div
-                style={{
-                  display: "grid",
-                  placeItems: "center",
-                  height: "100%",
-                  color: "rgba(255,255,255,.7)",
-                }}
-              >
-                Sin imagen
-              </div>
+              <div className="no-image">Sin imagen</div>
             )}
           </div>
 
           {/* Precio + botones */}
-          <section
-            style={{
-              background: "rgba(255,255,255,.08)",
-              borderRadius: 16,
-              padding: 16,
-              border: "1px solid rgba(255,255,255,.18)",
-              marginTop: 16,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
-              <span style={{ fontSize: 24, fontWeight: 700, color: "white" }}>
-                ${price.toFixed(2)}
-              </span>
+          <section className="price-section">
+            <div className="price-row">
+              <span className="price">${price.toFixed(2)}</span>
             </div>
 
-            <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+            <div className="button-row">
               <button
                 className="btn"
                 onClick={addToCart}
                 disabled={cart.find((item) => item.id === game.id)}
-                style={{
-                  background: cart.find((item) => item.id === game.id)
-                    ? '#4b6479'
-                    : undefined,
-                  color: cart.find((item) => item.id === game.id)
-                    ? '#acb4bd'
-                    : undefined,
-                  cursor: cart.find((item) => item.id === game.id)
-                    ? 'not-allowed'
-                    : undefined,
-                }}
               >
-                {cart.find((item) => item.id === game.id) ? 'Agregado' : 'Agregar al carrito'}
+                {cart.find((item) => item.id === game.id) ? "Agregado" : "Agregar al carrito"}
               </button>
               <button
                 className="btn"
@@ -227,15 +133,7 @@ export default function GameDetail() {
           </section>
 
           {/* Tabs */}
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              borderTop: "1px solid rgba(255,255,255,.18)",
-              paddingTop: 12,
-              marginTop: 16,
-            }}
-          >
+          <div className="tab-bar">
             <button
               className={`gd-tab ${activeTab === "desc" ? "gd-tab--active" : ""}`}
               onClick={() => setActiveTab("desc")}
@@ -252,45 +150,27 @@ export default function GameDetail() {
 
           {/* Contenido de tabs */}
           {activeTab === "desc" ? (
-            <div style={{ color: "rgba(255,255,255,.92)", lineHeight: 1.6, marginTop: 10 }}>
+            <div className="game-description">
               {game.description || "Sin descripción disponible."}
-              <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+              <div className="tags">
                 {game.tags?.map((tag, idx) => (
-                  <span key={idx} style={{ background: '#2a475e', color: '#c7d5e0', borderRadius: 12, padding: '2px 10px', fontSize: 13 }}>{tag}</span>
+                  <span key={idx} className="tag">
+                    {tag}
+                  </span>
                 ))}
               </div>
             </div>
           ) : (
-            <div style={{ marginTop: 10 }}>
-              {(game.reviews || []).length === 0 && (
-                <div style={{ color: "rgba(255,255,255,.8)" }}>
-                  Sé el primero en reseñar.
-                </div>
+            <div className="game-reviews">
+              {(game.reviews || []).length ? (
+                game.reviews.map((review, idx) => (
+                  <div key={idx} className="review">
+                    <strong>{review.user || "Anónimo"}:</strong> {review.comment}
+                  </div>
+                ))
+              ) : (
+                <div className="no-reviews">No hay reseñas.</div>
               )}
-              {(game.reviews || []).map((r) => (
-                <article
-                  key={r.id}
-                  style={{
-                    background: "rgba(255,255,255,.08)",
-                    borderRadius: 16,
-                    padding: 14,
-                    border: "1px solid rgba(255,255,255,.18)",
-                    color: "rgba(255,255,255,.92)",
-                    marginBottom: 10,
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <div style={{ fontWeight: 600 }}>{r.user}</div>
-                    <div style={{ color: "rgba(255,255,255,.75)", fontSize: 14 }}>
-                      {r.date}
-                    </div>
-                  </div>
-                  <div style={{ marginTop: 6, fontSize: 14 }}>
-                    Puntaje: ⭐ {Number(r.rating || 0).toFixed(1)}
-                  </div>
-                  <p style={{ marginTop: 8, lineHeight: 1.5 }}>{r.text}</p>
-                </article>
-              ))}
             </div>
           )}
         </div>

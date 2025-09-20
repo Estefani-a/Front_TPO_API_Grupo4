@@ -1,0 +1,258 @@
+/* GameDetail.css */
+
+.gd-bg-animated {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: #142a3a;
+}
+
+
+.container.game-detail {
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  align-items: center;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 20px;
+  color: white;
+}
+
+/* Título del juego */
+.logo {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.logo-placeholder {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Imagen de portada */
+.cover-image {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 15px;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cover-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+}
+
+/* Sección de precio y botones */
+.price-section {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.price-row {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #4fc3f7;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Botones mejorados */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #2196f3;
+  color: white;
+  min-width: 120px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.btn:hover {
+  background: #1976d2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  background: #546e7a;
+  color: #b0bec5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(84, 110, 122, 0.3);
+}
+
+.btn:disabled:hover {
+  background: #546e7a;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(84, 110, 122, 0.3);
+}
+
+/* Segundo botón con estilo diferente */
+.button-row .btn:last-child {
+  background: #4caf50;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.button-row .btn:last-child:hover {
+  background: #388e3c;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+/* Tabs */
+.tab-bar {
+  display: flex;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 15px;
+  gap: 25px;
+}
+
+.gd-tab {
+  background: none;
+  border: none;
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.gd-tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.gd-tab--active {
+  color: #4fc3f7;
+  border-bottom-color: #4fc3f7;
+}
+
+/* Contenido de descripción */
+.game-description {
+  line-height: 1.6;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tags {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: rgba(79, 195, 247, 0.2);
+  color: #4fc3f7;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+}
+
+/* Reseñas */
+.game-reviews {
+  space-y: 15px;
+}
+
+.review {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.review strong {
+  color: #4fc3f7;
+  font-weight: 600;
+}
+
+.no-reviews {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-card {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .logo-placeholder {
+    font-size: 24px;
+  }
+  
+  .price {
+    font-size: 24px;
+  }
+  
+  .button-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn {
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .tab-bar {
+    gap: 20px;
+  }
+}
