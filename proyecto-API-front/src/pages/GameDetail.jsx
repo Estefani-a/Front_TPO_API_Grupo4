@@ -25,6 +25,15 @@ export default function GameDetail() {
   const [activeTab, setActiveTab] = useState("desc");
   const [cart, setCart] = useState([]);
 
+  // Reviews de ejemplo con calificaciones variadas
+  const sampleReviews = [
+    { user: "GamerPro2024", comment: "Me divertí jugándolo, muy bueno", rating: 5 },
+    { user: "SteamUser", comment: "Excelente juego, lo recomiendo totalmente", rating: 5 },
+    { user: "PlayerOne", comment: "Está bueno pero le falta contenido", rating: 4 },
+    { user: "Juan123", comment: "Entretenido, aunque esperaba más", rating: 3},
+    { user: "user_pro", comment: "No puedo parar de jugar", rating: 5 }
+  ];
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem("cart");
@@ -47,6 +56,22 @@ export default function GameDetail() {
       window.removeEventListener("focus", reloadCart);
     };
   }, []);
+
+  // Componente para las estrellas individuales de cada reseña
+  const ReviewStars = ({ rating }) => {
+    return (
+      <div className="review-stars">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`review-star ${star <= rating ? 'review-star-filled' : 'review-star-empty'}`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   const addToCart = () => {
     if (!game) return;
@@ -72,6 +97,27 @@ export default function GameDetail() {
       console.error(e);
       alert("No se pudo agregar al carrito.");
     }
+  };
+
+  // Componente para la calificación general del juego
+  const OverallRating = ({ rating = 4.5 }) => {
+    const fullStars = Math.floor(rating);
+    return (
+      <div className="overall-rating">
+        <div className="star-rating">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`star ${star <= fullStars ? 'star-filled' : 'star-empty'}`}
+            >
+              ★
+            </span>
+          ))}
+          <span className="rating-text">({rating}/5)</span>
+        </div>
+        <p className="rating-subtitle">Calificación general</p>
+      </div>
+    );
   };
 
   if (!game) {
@@ -109,6 +155,11 @@ export default function GameDetail() {
             )}
           </div>
 
+          {/* Calificación General */}
+          <div className="rating-section">
+            <OverallRating rating={4.5} />
+          </div>
+
           {/* Precio + botones */}
           <section className="price-section">
             <div className="price-row">
@@ -144,7 +195,7 @@ export default function GameDetail() {
               className={`gd-tab ${activeTab === "reviews" ? "gd-tab--active" : ""}`}
               onClick={() => setActiveTab("reviews")}
             >
-              Reseñas ({(game.reviews || []).length})
+              Reseñas ({sampleReviews.length})
             </button>
           </div>
 
@@ -162,15 +213,15 @@ export default function GameDetail() {
             </div>
           ) : (
             <div className="game-reviews">
-              {(game.reviews || []).length ? (
-                game.reviews.map((review, idx) => (
-                  <div key={idx} className="review">
-                    <strong>{review.user || "Anónimo"}:</strong> {review.comment}
+              {sampleReviews.map((review, idx) => (
+                <div key={idx} className="review">
+                  <div className="review-header">
+                    <strong className="review-user">{review.user}</strong>
+                    <ReviewStars rating={review.rating} />
                   </div>
-                ))
-              ) : (
-                <div className="no-reviews">No hay reseñas.</div>
-              )}
+                  <p className="review-comment">{review.comment}</p>
+                </div>
+              ))}
             </div>
           )}
         </div>

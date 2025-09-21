@@ -7,7 +7,6 @@
   background: #142a3a;
 }
 
-
 .container.game-detail {
   padding: 15px;
   display: flex;
@@ -68,6 +67,66 @@
   color: rgba(255, 255, 255, 0.7);
   font-size: 16px;
 }
+
+/* Sección de calificación general */
+.rating-section {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: center;
+}
+
+.overall-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.star {
+  font-size: 22px;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.star-filled {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  animation: sparkle 2s ease-in-out infinite alternate;
+}
+
+.star-empty {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes sparkle {
+  0% { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) brightness(1); }
+  100% { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) brightness(1.2); }
+}
+
+.rating-text {
+  margin-left: 8px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.rating-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* CSS sin las clases del botón de like que ya no necesitamos */
 
 /* Sección de precio y botones */
 .price-section {
@@ -200,24 +259,65 @@
   border: 1px solid rgba(79, 195, 247, 0.3);
 }
 
-/* Reseñas */
+/* Reseñas individuales */
 .game-reviews {
-  space-y: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .review {
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 10px;
+  border-radius: 12px;
+  padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  line-height: 1.5;
-  font-size: 14px;
+  transition: all 0.3s ease;
 }
 
-.review strong {
+.review:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.review-user {
   color: #4fc3f7;
   font-weight: 600;
+  font-size: 15px;
+}
+
+.review-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.review-star {
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.review-star-filled {
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+}
+
+.review-star-empty {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.review-comment {
+  line-height: 1.5;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-style: italic;
 }
 
 .no-reviews {
@@ -254,5 +354,19 @@
   
   .tab-bar {
     gap: 20px;
+  }
+
+  .rating-section {
+    padding: 15px;
+  }
+
+  .star-rating {
+    justify-content: center;
+  }
+
+  .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
