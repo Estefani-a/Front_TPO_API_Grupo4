@@ -1,6 +1,6 @@
 // Soporte.jsx - Actualizado  
 import React, { useEffect } from "react";
-import "./ExtraPages.css";
+import "./Soporte.css";
 
 export default function Soporte() {
   useEffect(() => {
