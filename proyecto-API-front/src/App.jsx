@@ -5,6 +5,9 @@ import Register from "./pages/register";
 import Home from "./pages/home";
 import Checkout from "./pages/checkout";
 import GameDetail from "./pages/GameDetail";
+import AcercaDe from "./pages/AcercaDe";
+import Soporte from "./pages/Soporte";
+
 
 export default function App() {
   return (
@@ -18,6 +21,8 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/game/:id" element={<GameDetail />} />
+        <Route path="/acerca-de" element={<AcercaDe />} />
+        <Route path="/soporte" element={<Soporte />} />
       </Routes>
     </>
   );

@@ -71,8 +71,20 @@ export default function HeaderSteam() {
               TIENDA
             </a>
             <a href="#" style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}>COMUNIDAD</a>
-            <a href="#" style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}>ACERCA DE</a>
-            <a href="#" style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}>SOPORTE</a>
+            <a
+              href="#"
+              onClick={e => { e.preventDefault(); navigate("/acerca-de"); }}
+              style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}
+            >
+              ACERCA DE
+            </a>
+            <a
+              href="#"
+              onClick={e => { e.preventDefault(); navigate("/soporte"); }}
+              style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}
+            >
+              SOPORTE
+            </a>
           </nav>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', height: '60px', position: 'relative' }}>
