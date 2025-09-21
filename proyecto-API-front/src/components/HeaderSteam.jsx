@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const steamLogo = "https://store.cloudflare.steamstatic.com/public/shared/images/header/logo_steam.svg?t=962016";
 
-export default function HeaderSteam() {
+export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFromCart, total }) {
   const [showTagDropdown, setShowTagDropdown] = React.useState(false);
   // Obtener tags únicos de todos los juegos (incluyendo custom)
   const ALL_TAGS = [
@@ -88,6 +88,96 @@ export default function HeaderSteam() {
           </nav>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', height: '60px', position: 'relative' }}>
+          {/* Botón del carrito */}
+          <button
+            className="cart-btn"
+            style={{ marginRight: 18 }}
+            onClick={() => setShowCart(true)}
+          >
+            🛒
+            {cart.length > 0 && (
+              <span className="cart-count">{cart.length}</span>
+            )}
+          </button>
+          {/* Popup del carrito */}
+          {showCart && (
+            <div className="cart-popup-overlay" onClick={() => setShowCart(false)}>
+              <div className="cart-popup" onClick={e => e.stopPropagation()}>
+                <h2 style={{ color: "#66c0f4", marginBottom: 24 }}>Tu carrito</h2>
+                {cart.length === 0 ? (
+                  <div style={{ color: "#fff" }}>Tu carrito está vacío.</div>
+                ) : (
+                  <div>
+                    {cart.map((item) => (
+                      <div key={item.id} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        background: "#23262e",
+                        borderRadius: 8,
+                        marginBottom: 12,
+                        padding: 8,
+                      }}>
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          style={{
+                            width: 60,
+                            height: 28,
+                            objectFit: "cover",
+                            borderRadius: 4,
+                            marginRight: 12,
+                          }}
+                        />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ color: "#fff" }}>{item.title}</div>
+                          <div style={{ color: "#66c0f4" }}>
+                            ${Number(item.price).toFixed(2)} {item.qty ? `x${item.qty}` : ""}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          style={{
+                            background: "#c1272d",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 4,
+                            padding: "4px 10px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    ))}
+                    <div style={{
+                      marginTop: 16,
+                      textAlign: "right",
+                      color: "#fff",
+                      fontWeight: "bold",
+                    }}>
+                      Total: ${total.toFixed(2)}
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={() => setShowCart(false)}
+                  style={{
+                    marginTop: 18,
+                    background: "#2a475e",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 4,
+                    padding: "8px 20px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          )}
+          {/* ...Botones admin/login/register... */}
           {isAdmin ? (
             <>
               <button

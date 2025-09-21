@@ -97,12 +97,6 @@ const NavBar = ({ handleChange, input, onCartClick, cartCount, onTagFilter }) =>
             </svg>
           </button>
         </div>
-        <button className="cart-btn" onClick={onCartClick}>
-          🛒
-          {cartCount > 0 && (
-            <span className="cart-count">{cartCount}</span>
-          )}
-        </button>
       </div>
     </nav>
   );
