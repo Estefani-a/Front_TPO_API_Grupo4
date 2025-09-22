@@ -225,7 +225,7 @@ export default function Home({ search = "" }) {
   const finalList = (search?.length ? filteredByProp : foundGames) || [];
 
   return (
-    <div className="home-root" style={{ marginTop: 60, background: "transparent" }}>
+  <div className="home-root" style={{ marginTop: 60, background: "linear-gradient(135deg, #1b2838 0%, #171a21 100%)", minHeight: '100vh' }}>
       {/* Toast (sin alert y sin "localhost dice") */}
       {toast && (
         <div
@@ -260,108 +260,7 @@ export default function Home({ search = "" }) {
           <SteamCarousel addToCart={addToCart} cart={cart} navigate={navigate} />
       )}
 
-      {/* Popup Carrito */}
-      {showCart && (
-        <div className="cart-popup-overlay" onClick={() => setShowCart(false)}>
-          <div className="cart-popup" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ color: "#66c0f4", marginBottom: 24 }}>Tu carrito</h2>
-            {cart.length === 0 ? (
-              <div style={{ color: "#fff" }}>Tu carrito está vacío.</div>
-            ) : (
-              <div>
-                {cart.map((item) => (
-                  <div
-                    key={item.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      background: "#23262e",
-                      borderRadius: 8,
-                      marginBottom: 12,
-                      padding: 8,
-                    }}
-                  >
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      style={{
-                        width: 60,
-                        height: 28,
-                        objectFit: "cover",
-                        borderRadius: 4,
-                        marginRight: 12,
-                      }}
-                    />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ color: "#fff" }}>{item.title}</div>
-                      <div style={{ color: "#66c0f4" }}>
-                        ${Number(item.price).toFixed(2)}{" "}
-                        {item.qty ? `x${item.qty}` : ""}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      style={{
-                        background: "#c1272d",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 4,
-                        padding: "4px 10px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                ))}
-                <div
-                  style={{
-                    marginTop: 16,
-                    textAlign: "right",
-                    color: "#fff",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Total: ${total.toFixed(2)}
-                </div>
-                {/* Si usan checkout: */}
-                {/* <button
-                  onClick={() => navigate('/checkout', { state: { cart, total } })}
-                  style={{
-                    width: "100%",
-                    marginTop: 16,
-                    padding: "12px",
-                    background: "#66c0f4",
-                    color: "#171a21",
-                    border: "none",
-                    borderRadius: 4,
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  Comprar
-                </button> */}
-              </div>
-            )}
-            <button
-              onClick={() => setShowCart(false)}
-              style={{
-                marginTop: 18,
-                background: "#2a475e",
-                color: "#fff",
-                border: "none",
-                borderRadius: 4,
-                padding: "8px 20px",
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
-
+     
       {/* Lista de juegos */}
       <div
         style={{
@@ -373,7 +272,7 @@ export default function Home({ search = "" }) {
           alignItems: "center",
         }}
       >
-        <div className="featured-games-container" style={{ width: "100%" }}>
+  <div className="featured-games-container" style={{ width: "100%", background: '#23262e', borderRadius: 18, boxShadow: '0 8px 32px #000a', padding: '32px 32px 24px 32px' }}>
           <h2 className="featured-title">Juegos destacados</h2>
           {tagFilter && (
             <div style={{ marginBottom: 16 }}>
