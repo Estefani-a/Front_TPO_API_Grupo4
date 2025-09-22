@@ -35,7 +35,11 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
     image: '',
     description: '',
     tags: '',
-    price: ''
+    price: '',
+    screenshot1: '',
+    screenshot2: '',
+    screenshot3: '',
+    screenshot4: ''
   });
   const [showUserDropdown, setShowUserDropdown] = React.useState(false);
   
@@ -360,7 +364,13 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
               description: form.description,
               tags: tagsFormatted,
               price: parseFloat(form.price),
-              images: [form.image],
+              images: [
+                form.screenshot1 || form.image,
+                form.screenshot2 || form.image,
+                form.screenshot3 || form.image,
+                form.screenshot4 || form.image
+              ].filter(Boolean),
+              rating: 4.0,
               reviews: [],
             };
             const raw = localStorage.getItem('customGames');
@@ -369,7 +379,7 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
             localStorage.setItem('customGames', JSON.stringify(customGames));
             window.dispatchEvent(new CustomEvent('customGames-updated'));
             setShowAddModal(false);
-            setForm({ title: '', image: '', description: '', tags: '', price: '' });
+            setForm({ title: '', image: '', description: '', tags: '', price: '', screenshot1: '', screenshot2: '', screenshot3: '', screenshot4: '' });
             alert('Juego agregado correctamente');
           }}>
             <h3 style={{ color: '#66c0f4', marginBottom: 8 }}>Agregar juego</h3>
@@ -425,6 +435,15 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
               )}
             </div>
             <input type="number" placeholder="Precio" value={form.price} required min={0} step={0.01} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} style={{ padding: 8, borderRadius: 6, border: 'none', fontSize: 15 }} />
+            
+            {/* Campos para screenshots */}
+            <div style={{ marginTop: 12 }}>
+              <h4 style={{ color: '#66c0f4', fontSize: 14, margin: '0 0 8px 0' }}>Screenshots (4 imágenes)</h4>
+              <input type="text" placeholder="Screenshot 1 - URL de la imagen" value={form.screenshot1} onChange={e => setForm(f => ({ ...f, screenshot1: e.target.value }))} style={{ padding: 8, borderRadius: 6, border: 'none', fontSize: 15, marginBottom: 6 }} />
+              <input type="text" placeholder="Screenshot 2 - URL de la imagen" value={form.screenshot2} onChange={e => setForm(f => ({ ...f, screenshot2: e.target.value }))} style={{ padding: 8, borderRadius: 6, border: 'none', fontSize: 15, marginBottom: 6 }} />
+              <input type="text" placeholder="Screenshot 3 - URL de la imagen" value={form.screenshot3} onChange={e => setForm(f => ({ ...f, screenshot3: e.target.value }))} style={{ padding: 8, borderRadius: 6, border: 'none', fontSize: 15, marginBottom: 6 }} />
+              <input type="text" placeholder="Screenshot 4 - URL de la imagen" value={form.screenshot4} onChange={e => setForm(f => ({ ...f, screenshot4: e.target.value }))} style={{ padding: 8, borderRadius: 6, border: 'none', fontSize: 15 }} />
+            </div>
             <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
               <button type="submit" style={{ background: '#66c0f4', color: '#171a21', border: 'none', borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>Guardar</button>
               <button type="button" style={{ background: '#c1272d', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer' }} onClick={() => setShowAddModal(false)}>Cancelar</button>
