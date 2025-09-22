@@ -48,15 +48,25 @@ proyecto-API-front/
 ├── public/                
 ├── src/                   
 │   ├── assets/           # Imágenes y recursos
+|   ├── components/       # Componentes de view reutilizables
+|   |   ├── HeaderSteam.jsx
+|   |   ├── NavBar.jsx
+|   |   └── SteamCarousel.jsx
+|   |
 │   ├── pages/            # Componentes de página
+|   |   ├── AcercaDe.jsx  # Informacion del sitio
 │   │   ├── auth.css      # Estilos de autenticación
 │   │   ├── cart.jsx      # Página de carrito
 │   │   ├── checkout.jsx  # Página de compra
+|   |   ├── GameDetail.jsx #Informacion del juego
 │   │   ├── home.jsx      # Página principal
 │   │   ├── login.jsx     # Página de login
-│   │   └── register.jsx  # Página de registro
+│   │   |── register.jsx  # Página de registro
+|   |   └── Soporte.jsx   # Info y solicitudes de soporte
+|   |
 │   ├── App.jsx           # Componente principal
 │   ├── App.css           # Estilos globales
+|   ├── index.css         # Estilos base
 │   └── main.jsx          
 └── package.json          # Dependencias y scripts
 ```
