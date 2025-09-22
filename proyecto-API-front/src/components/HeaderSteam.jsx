@@ -227,6 +227,7 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
                               border: "none",
                               borderRadius: 4,
                               padding: "4px 10px",
+                              marginRight: "12px", // separa el botón del borde derecho del contenedor
                               cursor: "pointer",
                             }}
                           >
