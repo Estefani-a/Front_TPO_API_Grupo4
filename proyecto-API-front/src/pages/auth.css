@@ -329,6 +329,20 @@ body {
   border-top: 1px solid #2d3544;
 }
 
+/* Variante transparente del footer */
+.auth-footer--transparent {
+  background: transparent !important;
+  border-top: none !important;
+  color: rgba(255, 255, 255, 0.85); /* mejora contraste sobre fondos oscuros */
+}
+
+/* Variante con color del carrusel/panel (#23262e) */
+.auth-footer--panel {
+  background: #23262e !important;
+  color: #c7d5e0 !important;
+  border-top: none !important; /* sin línea superior */
+}
+
 /* checkout */
 
 .auth-checkout-summary {
@@ -458,4 +472,46 @@ body {
   position: relative;
   z-index: 1;
   margin-bottom: 2rem;
+}
+
+/* --- Overlay del pop-up de autenticación ---
+   Ocupa toda la pantalla. Si se hace click aquí, se cierra el modal.
+   Tiene el mismo gradiente animado que las pantallas de login/register.
+*/
+.auth-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(-45deg, #04addc, #89dcf0, #2a454a, #0a5891, #142a3a);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+}
+
+/* Fondo del panel del modal
+   Aplica el gradiente (animado) al cuadro del popup. 
+   Usamos la combinación ".cart-popup.auth-popup-panel" para aumentar especificidad
+   y sobreescribir el background por defecto de .cart-popup definido en NavBar.css.
+*/
+.auth-popup-panel,
+.cart-popup.auth-popup-panel {
+  background: linear-gradient(-45deg, #04addc, #89dcf0, #2a454a, #0a5891, #142a3a);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Variante estática (sin animación)
+   Útil si se prefiere el gradiente fijo.
+*/
+.auth-popup-panel--static,
+.cart-popup.auth-popup-panel--static {
+  background: linear-gradient(-45deg, #04addc, #89dcf0, #2a454a, #0a5891, #142a3a);
+  background-size: cover;
+  animation: none;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }

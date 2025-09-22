@@ -694,7 +694,7 @@ export default function Home({ search = "" }) {
         </div>
       </div>
 
-      <footer className="footer" style={{ background: "transparent" }}>
+      <footer className="auth-footer auth-footer--panel">
         © 2025 Grupo 4. Todos los derechos reservados.
       </footer>
     </div>
