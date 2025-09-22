@@ -18,12 +18,42 @@ export default function GameDetail() {
 
   const imgs = useMemo(() => {
     if (!game) return [];
-    if (Array.isArray(game.images) && game.images.length) return game.images;
-    return game.image ? [game.image] : [];
+    
+    const allImages = [];
+    
+    // Agregar imagen principal primero
+    if (game.image) {
+      allImages.push(game.image);
+    }
+    
+    // Agregar imágenes del array si existen y no están duplicadas
+    if (Array.isArray(game.images) && game.images.length) {
+      game.images.forEach(img => {
+        if (img && !allImages.includes(img)) {
+          allImages.push(img);
+        }
+      });
+    }
+    
+    return allImages.length > 0 ? allImages : [];
   }, [game]);
 
   const [activeTab, setActiveTab] = useState("desc");
   const [cart, setCart] = useState([]);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // Funciones para el carrusel
+  const nextImage = () => {
+    setActiveImageIndex((prev) => (prev + 1) % imgs.length);
+  };
+
+  const prevImage = () => {
+    setActiveImageIndex((prev) => (prev - 1 + imgs.length) % imgs.length);
+  };
+
+  const goToImage = (index) => {
+    setActiveImageIndex(index);
+  };
 
   // Reviews de ejemplo con calificaciones variadas
   const sampleReviews = [
@@ -146,12 +176,62 @@ export default function GameDetail() {
             <div className="logo-placeholder">{game.title}</div>
           </div>
 
-          {/* Portada */}
-          <div className="cover-image">
-            {imgs[0] ? (
-              <img src={imgs[0]} alt="cover" />
-            ) : (
-              <div className="no-image">Sin imagen</div>
+          {/* Carrusel de imágenes */}
+          <div className="image-carousel">
+            <div className="main-image-container">
+              {imgs.length > 0 ? (
+                <>
+                  <img 
+                    src={imgs[activeImageIndex]} 
+                    alt={`${game.title} - Imagen ${activeImageIndex + 1}`}
+                    className="main-image"
+                  />
+                  
+                  {/* Botones de navegación */}
+                  {imgs.length > 1 && (
+                    <>
+                      <button 
+                        className="carousel-btn carousel-btn-prev" 
+                        onClick={prevImage}
+                        aria-label="Imagen anterior"
+                      >
+                        ‹
+                      </button>
+                      <button 
+                        className="carousel-btn carousel-btn-next" 
+                        onClick={nextImage}
+                        aria-label="Imagen siguiente"
+                      >
+                        ›
+                      </button>
+                    </>
+                  )}
+                </>
+              ) : (
+                <div className="no-image">Sin imagen</div>
+              )}
+            </div>
+            
+            {/* Thumbnails */}
+            {imgs.length > 1 && (
+              <div className="thumbnails-container">
+                {imgs.map((img, index) => (
+                  <button
+                    key={index}
+                    className={`thumbnail ${index === activeImageIndex ? 'thumbnail-active' : ''}`}
+                    onClick={() => goToImage(index)}
+                  >
+                    <img src={img} alt={`Thumbnail ${index + 1}`} />
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {/* Indicador de posición */}
+            {imgs.length > 1 && (
+              <div className="carousel-indicator">
+                {activeImageIndex + 1} / {imgs.length}
+              </div>
             )}
           </div>
 

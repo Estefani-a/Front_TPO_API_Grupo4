@@ -1,3 +1,7 @@
+body {
+  background: linear-gradient(135deg, #1b2838 0%, #171a21 100%) !important;
+  min-height: 100vh;
+}
 .auth-body {
   margin: 0;
   height: 100vh;
