@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "../pages/auth.css";
 
 const steamLogo = "https://store.cloudflare.steamstatic.com/public/shared/images/header/logo_steam.svg?t=962016";
 
 export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFromCart, total }) {
+  // Estados del header y utilidades
   const [showTagDropdown, setShowTagDropdown] = React.useState(false);
   // Obtener tags únicos de todos los juegos (incluyendo custom)
   const ALL_TAGS = [
@@ -38,7 +40,37 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
     price: ''
   });
   const [showUserDropdown, setShowUserDropdown] = React.useState(false);
+
+  // Popups de autenticación
+  // - showLogin y showRegister controlan la visibilidad de los modales de Login y Registro
+  const [showLogin, setShowLogin] = React.useState(false);
+  const [showRegister, setShowRegister] = React.useState(false);
+
+  // Handlers de formularios del popup
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    const email = e.target.email.value.toLowerCase();
+    const password = e.target.password.value;
+    if (email === 'admin@admin' && password === 'admin') {
+      localStorage.setItem('isAdmin', 'true');
+      setShowLogin(false);
+      // Refrescar para que el header tome el estado admin inmediatamente
+      window.location.reload();
+      return;
+    }
+    alert('Credenciales incorrectas');
+  };
+
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+    // Aquí podrías guardar en API/LocalStorage; por ahora, feedback y cambio a login
+    alert('Cuenta creada. Ahora puedes iniciar sesión.');
+    setShowRegister(false);
+    setShowLogin(true);
+  };
+
   return (
+    // Header fijo tipo Steam (color y borde iguales al footer)
     <header style={{
       width: "100vw",
       left: 0,
@@ -99,7 +131,7 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
               <span className="cart-count">{cart.length}</span>
             )}
           </button>
-          {/* Popup del carrito */}
+          {/* Popup del carrito (reutiliza overlay/panel del cart) */}
           {showCart && (
             <div className="cart-popup-overlay" onClick={() => setShowCart(false)}>
               <div className="cart-popup" onClick={e => e.stopPropagation()}>
@@ -177,7 +209,7 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
               </div>
             </div>
           )}
-          {/* ...Botones admin/login/register... */}
+          {/* Botones admin/login/register */}
           {isAdmin ? (
             <>
               <button
@@ -297,13 +329,13 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
           ) : (
             <>
               <button
-                onClick={() => navigate("/login")}
+                onClick={() => setShowLogin(true)}
                 style={{ background: "linear-gradient(90deg, #3a9aed 0%, #2179c7 100%)", color: "#fff", border: "none", borderRadius: 2, padding: "8px 20px", fontSize: 13, cursor: "pointer", marginRight: 8 }}
               >
                 Iniciar sesión
               </button>
               <button
-                onClick={() => navigate("/register")}
+                onClick={() => setShowRegister(true)}
                 style={{ background: "#5c7e10", color: "#fff", border: "none", borderRadius: 2, padding: "8px 20px", fontSize: 13, cursor: "pointer" }}
               >
                 Registrarse
@@ -312,6 +344,89 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
           )}
         </div>
       </div>
+
+      {/* LOGIN POPUP
+          Estructura general del modal:
+          - Overlay: cart-popup-overlay (fondo translúcido; click cierra el modal)
+          - Panel: cart-popup + auth-popup-panel (reutiliza layout del cart y aplica gradiente del auth)
+          - stopPropagation en el panel evita que un click adentro cierre el modal
+      */}
+      {showLogin && (
+        <div className="cart-popup-overlay" onClick={() => setShowLogin(false)}>
+          <div
+            className="cart-popup auth-popup-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{ position: 'relative', borderRadius: 12, padding: '28px 28px 22px 28px', width: '100%', maxWidth: 520, boxShadow: '0 4px 24px rgba(0,0,0,0.18)' }}
+          >
+            {/* Botón de cierre "×" */}
+            <button onClick={() => setShowLogin(false)} aria-label="Cerrar" style={{ position: 'absolute', top: 10, right: 10, background: 'transparent', color: '#c7d5e0', border: 'none', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
+            <div style={{ textAlign: 'center', marginBottom: 16 }}>
+              <img src="/Steam_icon_logo.png" alt="Steam Logo" style={{ width: 72, height: 72, objectFit: 'contain', filter: 'drop-shadow(0 2px 10px rgba(0,0,0,0.3))' }} />
+            </div>
+            <h2 style={{ color: '#66c0f4', margin: '0 0 12px 0', textAlign: 'center' }}>Iniciar Sesión</h2>
+            <form onSubmit={handleLoginSubmit} className="auth-form" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* Campos de Login */}
+              <div className="auth-form-group">
+                <label htmlFor="email" style={{ color: 'rgba(255,255,255,0.9)' }}>Email</label>
+                <input id="email" name="email" type="email" placeholder="correo@ejemplo.com" required />
+              </div>
+              <div className="auth-form-group">
+                <label htmlFor="password" style={{ color: 'rgba(255,255,255,0.9)' }}>Contraseña</label>
+                <input id="password" name="password" type="password" placeholder="••••••••" required />
+              </div>
+              <button type="submit" className="auth-btn">Ingresar</button>
+            </form>
+            <p className="auth-switch-text" style={{ textAlign: 'center' }}>
+              ¿No tienes cuenta?{' '}
+              <span className="auth-link" style={{ cursor: 'pointer' }} onClick={() => { setShowLogin(false); setShowRegister(true); }}>Regístrate</span>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* REGISTER POPUP
+          Similar al Login. Se limita el alto con maxHeight y se habilita scroll interno (overflowY: 'auto')
+      */}
+      {showRegister && (
+        <div className="cart-popup-overlay" onClick={() => setShowRegister(false)}>
+          <div
+            className="cart-popup auth-popup-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{ position: 'relative', borderRadius: 12, padding: '22px 22px 18px 22px', width: '100%', maxWidth: 520, maxHeight: '82vh', overflowY: 'auto', boxShadow: '0 4px 24px rgba(0,0,0,0.18)' }}
+          >
+            {/* Botón de cierre "×" */}
+            <button onClick={() => setShowRegister(false)} aria-label="Cerrar" style={{ position: 'absolute', top: 10, right: 10, background: 'transparent', color: '#c7d5e0', border: 'none', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
+            <div style={{ textAlign: 'center', marginBottom: 12 }}>
+              <img src="/Steam_icon_logo.png" alt="Steam Logo" style={{ width: 60, height: 60, objectFit: 'contain', filter: 'drop-shadow(0 2px 10px rgba(0,0,0,0.3))' }} />
+            </div>
+            <h2 style={{ color: '#66c0f4', margin: '0 0 10px 0', textAlign: 'center' }}>Registrarse</h2>
+            <form onSubmit={handleRegisterSubmit} className="auth-form" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* Campos de Registro */}
+              <div className="auth-form-group">
+                <label htmlFor="name" style={{ color: 'rgba(255,255,255,0.9)' }}>Nombre</label>
+                <input id="name" name="name" type="text" placeholder="Tu nombre" required />
+              </div>
+              <div className="auth-form-group">
+                <label htmlFor="reg-email" style={{ color: 'rgba(255,255,255,0.9)' }}>Email</label>
+                <input id="reg-email" name="email" type="email" placeholder="correo@ejemplo.com" required />
+              </div>
+              <div className="auth-form-group">
+                <label htmlFor="reg-password" style={{ color: 'rgba(255,255,255,0.9)' }}>Contraseña</label>
+                <input id="reg-password" name="password" type="password" placeholder="********" required />
+              </div>
+              <div className="auth-form-group">
+                <label htmlFor="confirmPassword" style={{ color: 'rgba(255,255,255,0.9)' }}>Confirmar Contraseña</label>
+                <input id="confirmPassword" name="confirmPassword" type="password" placeholder="********" required />
+              </div>
+              <button type="submit" className="auth-btn">Crear cuenta</button>
+            </form>
+            <p className="auth-switch-text" style={{ textAlign: 'center' }}>
+              ¿Ya tienes cuenta?{' '}
+              <span className="auth-link" style={{ cursor: 'pointer' }} onClick={() => { setShowRegister(false); setShowLogin(true); }}>Inicia sesión</span>
+            </p>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
