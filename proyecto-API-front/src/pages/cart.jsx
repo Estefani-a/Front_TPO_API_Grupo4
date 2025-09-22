@@ -55,6 +55,7 @@ export default function Cart() {
                       borderRadius: 2,
                       padding: "4px 10px",
                       marginLeft: "auto",
+                      marginRight: "12px", // separa el botón del borde derecho
                       cursor: "pointer",
                       fontSize: "12px"
                     }}

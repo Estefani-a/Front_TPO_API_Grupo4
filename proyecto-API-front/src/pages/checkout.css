@@ -1,0 +1,214 @@
+/* Root del checkout
+   Contenedor general de la página de checkout. Define padding, ocupa el alto de la ventana y
+   oculta el scroll horizontal si algún elemento se desborda accidentalmente. */
+.checkout-root {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  padding: 2rem;
+  overflow-x: hidden; /* evita scroll horizontal en la página */
+}
+
+/* Botón volver flotante
+   Botón circular/oval fijo al costado izquierdo de la pantalla para volver al Home. */
+.checkout-back-btn {
+  position: fixed;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(23, 26, 33, 0.95);
+  border: 2px solid #355166;
+  color: #66c0f4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  z-index: 100;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.checkout-back-btn:hover,
+.checkout-back-btn:focus-visible {
+  background: #23303f;
+  border-color: #66c0f4;
+  transform: translateY(-50%) translateX(5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  outline: none;
+}
+
+/* Contenedor principal
+   Envuelve la tarjeta centrada. Permite scroll vertical si el contenido crece. */
+.checkout-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Tarjeta
+   Panel con fondo del checkout que contiene el resumen y el formulario. */
+.checkout-card {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  padding: 2.5rem 2rem; /* sube un poco el contenido*/
+  background: #23262e;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+
+/* Resumen de compra: encabezado y total de la compra, centrados con un recuadro destacado. */
+.checkout-summary {
+  text-align: center;
+  margin-bottom: 2rem; /* separa el total del primer campo del formulario */
+}
+.checkout-summary-title {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+  font-size: 1.3rem;
+}
+.checkout-summary-box {
+  background: rgba(102, 192, 244, 0.15);
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid #66c0f4;
+  display: flex;
+  justify-content: center; /* centra label y total */
+  gap: 12px; /* espacio entre label y total */
+  align-items: center;
+}
+.checkout-summary-label {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: center;
+}
+.checkout-summary-total {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(102, 192, 244, 0.5);
+  text-align: center;
+}
+
+/* Formulario
+   Estilos base para los grupos del formulario, etiquetas e inputs/select. */
+
+.checkout-form-group {
+  margin-bottom: 1rem;
+}
+.checkout-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.checkout-input,
+.checkout-select {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #171a21;
+  box-sizing: border-box;
+  color: rgba(255, 255, 255, 0.95);
+}
+.checkout-input::placeholder { color: rgba(255,255,255,0.6); }
+.checkout-input:focus,
+.checkout-select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.1), 0 8px 25px rgba(0,0,0,0.15);
+  background: #171a21;
+}
+
+/* Ajustes del select
+   Oculta el ícono nativo y dibuja una flecha SVG a la derecha para evitar desbordes. */
+.checkout-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 2.5rem; /* espacio para el ícono */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366c0f4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 12px;
+}
+/* Oculta el ícono por defecto en IE/Edge heredados */
+select.checkout-select::-ms-expand { display: none; }
+
+.checkout-form-row {
+  display: flex;
+  gap: 1rem;
+}
+.checkout-form-row .checkout-form-group { flex: 1; }
+
+/* Acciones
+   Botones de confirmar/cancelar compra con estilos y estados hover/focus. */
+.checkout-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 24px;
+}
+.checkout-confirm-btn {
+  flex: 1;
+  height: 52px;
+  background: linear-gradient(135deg, #04addc 0%, #0a5891 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+  box-shadow: 0 4px 15px rgba(4, 173, 220, 0.25);
+}
+.checkout-confirm-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(4, 173, 220, 0.35);
+}
+
+.checkout-cancel-btn {
+  flex: 1;
+  height: 52px;
+  background: #1a2530;
+  border: 2px solid #355166;
+  border-radius: 12px;
+  color: #66c0f4;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+}
+.checkout-cancel-btn:hover,
+.checkout-cancel-btn:focus-visible {
+  background: #23303f;
+  border-color: #66c0f4;
+  outline: none;
+}
+
+/* Responsivo
+   Ajustes para pantallas pequeñas: reduce padding y apila campos de fila. */
+@media (max-width: 768px) {
+  .checkout-card { padding: 2rem 1.5rem; }
+  .checkout-form-row { flex-direction: column; }
+}
