@@ -1,69 +1,112 @@
-import { Link } from "react-router-dom";
-import "./auth.css";
+// Importación del componente Link de React Router para navegación entre páginas
+import { Link } from "react-router-dom"; 
+// Importación de los estilos CSS específicos para componentes de autenticación
+import "./auth.css";  
 
-export default function Login() {
-  const auth = "auth";
-  
+// Exportación por defecto del componente funcional Login
+export default function Login() {   
+  // Variable local que contiene el prefijo de clase CSS para mantener consistencia
+  const auth = "auth";      
+
+  // FUNCIÓN PARA MANEJAR EL ENVÍO DEL FORMULARIO
   const handleSubmit = (e) => {
+    // Prevenir el comportamiento por defecto del form (recarga de página)
     e.preventDefault();
+    
+    // OBTENER DATOS DEL FORMULARIO
+    // Obtener email del input y convertirlo a minúsculas para comparación
     const email = e.target.email.value.toLowerCase();
+    // Obtener contraseña del input tal como fue ingresada
     const password = e.target.password.value;
-    // Permitir acceso admin con email admin@admin y password admin
+    
+    // VALIDACIÓN DE CREDENCIALES DE ADMINISTRADOR
+    // Verificar si las credenciales coinciden con el admin hardcodeado
     if (email === "admin@admin" && password === "admin") {
+      // AUTENTICACIÓN EXITOSA PARA ADMIN
+      // Guardar en localStorage que el usuario es administrador
       localStorage.setItem("isAdmin", "true");
+      // Redirigir a la página principal usando navegación nativa del navegador
       window.location.href = "/";
+      // Terminar ejecución de la función aquí
       return;
     }
-    // Si quieres agregar lógica para otros usuarios, aquí
+    
+    // MANEJAR OTROS USUARIOS (placeholder para futuras implementaciones)
+    // Si quieres agregar lógica para otros usuarios, aquí 
+    
+    // CREDENCIALES INCORRECTAS
+    // Mostrar alerta si las credenciales no coinciden con admin
     alert("Credenciales incorrectas");
   };
 
   return (
+    // ESTRUCTURA PRINCIPAL DEL COMPONENTE
+    
+    // Contenedor principal que envuelve todo el formulario de login
     <div className="auth-body">
+      
+      {/* Contenedor secundario que centra el formulario en la página */}
       <div className={`${auth}-container`}>
+        
+        {/* Tarjeta/card que contiene el formulario con estilos específicos */}
         <div className={`${auth}-form-card`}>
+          
+          {/* SECCIÓN DEL LOGO */}
           <div className={`${auth}-logo`}>
+            {/* Imagen del logo de Steam con ruta relativa desde public */}
             <img src="/Steam_icon_logo.png" alt="Steam Logo" className={`${auth}-logo-image`} />
-          </div>
+          </div> 
 
-          <h2>Iniciar Sesión</h2>
+          {/* TÍTULO DE LA PÁGINA */}
+          <h2>Iniciar Sesión</h2> 
 
+          {/* FORMULARIO DE LOGIN */}
+          {/* onSubmit conecta el evento de envío con la función handleSubmit */}
           <form onSubmit={handleSubmit}>
+            
+            {/* CAMPO: EMAIL */}
             <div className={`${auth}-form-group`}>
               <label htmlFor="email">Email</label>
               <input 
-                id="email"
-                name="email"
-                type="email" 
-                placeholder="correo@ejemplo.com" 
-                required
+                id="email"                     // ID que conecta con el label
+                name="email"                   // Nombre para acceder al valor en handleSubmit
+                type="email"                   // Tipo que valida formato de email
+                placeholder="correo@ejemplo.com"  // Ejemplo de formato esperado
+                required                       // Campo obligatorio para validación HTML5
               />
-            </div>
+            </div> 
 
+            {/* CAMPO: CONTRASEÑA */}
             <div className={`${auth}-form-group`}>
               <label htmlFor="password">Contraseña</label>
               <input 
-                id="password"
-                name="password"
-                type="password" 
-                placeholder="••••••••" 
-                required
+                id="password"              // ID que conecta con el label
+                name="password"            // Nombre para acceder al valor en handleSubmit
+                type="password"            // Tipo que oculta el texto ingresado
+                placeholder="••••••••"     // Indicador visual de campo de contraseña
+                required                   // Campo obligatorio
               />
-            </div>
+            </div> 
 
+            {/* BOTÓN DE ENVÍO */}
+            {/* Al hacer click, se ejecuta handleSubmit automáticamente */}
             <button type="submit" className={`${auth}-btn`}>
               Ingresar
             </button>
-          </form>
+            
+          </form> 
 
+          {/* ENLACE PARA USUARIOS NUEVOS */}
           <p className={`${auth}-switch-text`}>
-            ¿No tienes cuenta?{" "}
+            ¿No tienes cuenta?{" "}  {/* Texto + espacio en blanco */}
+            {/* Link de React Router que navega a la página de registro */}
             <Link to="/register" className={`${auth}-link`}>
               Regístrate
             </Link>
           </p>
+          
         </div>
       </div>
     </div>
-  );
+  ); 
 }
