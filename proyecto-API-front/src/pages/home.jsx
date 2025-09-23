@@ -152,12 +152,15 @@ const gamesList = [
 export default function Home({ search = "" }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true';
+ 
 
   // Estado para el hover del juego seleccionado
   const [hoveredGame, setHoveredGame] = useState(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [hoverTimeout, setHoverTimeout] = useState(null);
+
+  // Verificar si el usuario es admin
+  const isAdmin = typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true';
 
   // Funciones para manejar el hover con delay
   const handleMouseEnter = (game) => {
@@ -200,7 +203,14 @@ export default function Home({ search = "" }) {
   };
 
   // Unir lista original y custom
-  const [removedIds, setRemovedIds] = useState([]);
+  const [removedIds, setRemovedIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('removedGames');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const getAllGames = React.useCallback(() => {
     // Filtra los juegos hardcodeados borrados temporalmente
     const filteredHardcoded = gamesList.filter(g => !removedIds.includes(g.id));
@@ -210,22 +220,54 @@ export default function Home({ search = "" }) {
   // ===== búsqueda =====
   const [input, setInput] = useState("");
   const [foundGames, setFoundGames] = useState(getAllGames());
-  const [tagFilter, setTagFilter] = useState("");
+  const [tagFilter, setTagFilter] = useState([]);  // Ahora es un array para múltiples categorías
   const handleChange = (e) => {
     const value = e.target.value;
     setInput(value);
     const filtered = getAllGames().filter((g) =>
       g.title.toLowerCase().includes(value.toLowerCase()) &&
-      (tagFilter ? g.tags?.includes(tagFilter) : true)
+      (tagFilter.length > 0 ? tagFilter.every(tag => g.tags?.includes(tag)) : true)
     );
     setFoundGames(filtered);
   };
 
   const handleTagFilter = (tag) => {
-    setTagFilter(tag);
+    // Si ya está activa la misma categoría, la desactivamos
+    if (tagFilter.includes(tag)) {
+      const newTagFilter = tagFilter.filter(t => t !== tag);
+      setTagFilter(newTagFilter);
+      setInput("");
+      const filtered = newTagFilter.length > 0 
+        ? getAllGames().filter((g) => newTagFilter.every(t => g.tags?.includes(t)))
+        : getAllGames();
+      setFoundGames(filtered);
+      return;
+    }
+    
+    // Agregar nueva categoría
+    const newTagFilter = [...tagFilter, tag];
+    setTagFilter(newTagFilter);
     setInput("");
-    const filtered = getAllGames().filter((g) => g.tags?.includes(tag));
+    const filtered = getAllGames().filter((g) => newTagFilter.every(t => g.tags?.includes(t)));
     setFoundGames(filtered);
+  };
+
+  // Función para remover una categoría específica
+  const removeTagFilter = (tag) => {
+    const newTagFilter = tagFilter.filter(t => t !== tag);
+    setTagFilter(newTagFilter);
+    setInput("");
+    const filtered = newTagFilter.length > 0 
+      ? getAllGames().filter((g) => newTagFilter.every(t => g.tags?.includes(t)))
+      : getAllGames();
+    setFoundGames(filtered);
+  };
+
+  // Función para limpiar todos los filtros
+  const clearAllFilters = () => {
+    setTagFilter([]);
+    setInput("");
+    setFoundGames(getAllGames());
   };
 
   // Actualizar la lista de juegos cuando removedIds cambie
@@ -313,6 +355,15 @@ export default function Home({ search = "" }) {
     }
   };
 
+  // Función para remover/ocultar juegos temporalmente
+  const removeGame = (gameId) => {
+    const newRemovedIds = [...removedIds, gameId];
+    setRemovedIds(newRemovedIds);
+    localStorage.setItem('removedGames', JSON.stringify(newRemovedIds));
+    setToast(`🗑️ Juego eliminado`);
+    setTimeout(() => setToast(""), 2500);
+  };
+
   const removeFromCart = (id) => {
     try {
       const updated = cart.filter((item) => item.id !== id);
@@ -333,13 +384,13 @@ export default function Home({ search = "" }) {
     [cart]
   );
 
-  // Filtro por prop externa `search`
+  // Filtro por prop externa `search` aplicado sobre los juegos ya filtrados por categoría
   const filteredByProp = useMemo(
     () =>
-      gamesList.filter((g) =>
+      foundGames.filter((g) =>
         g.title.toLowerCase().includes((search || "").toLowerCase())
       ),
-    [search]
+    [search, foundGames]
   );
 
   const finalList = (search?.length ? filteredByProp : foundGames) || [];
@@ -429,24 +480,83 @@ export default function Home({ search = "" }) {
             Juegos Destacados
           </h2>
           
+          {/* Indicador de filtros activos */}
+          {tagFilter.length > 0 && (
+            <div style={{
+              marginBottom: 16,
+              padding: '8px 12px',
+              background: '#1e2328',
+              borderRadius: 6,
+              border: '1px solid #2a475e'
+            }}>
+              <div style={{ 
+                color: '#66c0f4', 
+                fontSize: 12, 
+                fontWeight: 600,
+                marginBottom: 6
+              }}>
+                Filtros activos (debe tener TODAS las categorías):
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {tagFilter.map(tag => (
+                  <span
+                    key={tag}
+                    style={{
+                      background: '#66c0f4',
+                      color: '#1b2838',
+                      padding: '4px 8px',
+                      borderRadius: 4,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                    onClick={() => removeTagFilter(tag)}
+                    title="Clic para remover este filtro"
+                  >
+                    {tag}
+                    <span style={{ fontWeight: 'bold' }}>×</span>
+                  </span>
+                ))}
+                <button
+                  style={{
+                    background: '#ff6b6b',
+                    color: 'white',
+                    border: 'none',
+                    padding: '4px 8px',
+                    borderRadius: 4,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                  onClick={clearAllFilters}
+                  title="Limpiar todos los filtros"
+                >
+                  Limpiar todo
+                </button>
+              </div>
+            </div>
+          )}
+          
           {finalList.map((game, index) => (
-            <div
-              key={game.id}
-              onMouseEnter={() => handleMouseEnter(game)}
-              onMouseLeave={handleMouseLeave}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: 12,
-                marginBottom: 8,
-                borderRadius: 8,
-                background: hoveredGame?.id === game.id ? '#2a475e' : 'transparent',
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                border: hoveredGame?.id === game.id ? '1px solid #66c0f4' : '1px solid transparent'
-              }}
-              onClick={() => navigate(`/game/${game.id}`, { state: { game } })}
-            >
+            <div key={game.id}>
+              <div
+                onMouseEnter={() => handleMouseEnter(game)}
+                onMouseLeave={handleMouseLeave}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  padding: 12,
+                  borderRadius: 8,
+                  background: hoveredGame?.id === game.id ? '#2a475e' : 'transparent',
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  border: hoveredGame?.id === game.id ? '1px solid #66c0f4' : '1px solid transparent'
+                }}
+                onClick={() => navigate(`/game/${game.id}`, { state: { game } })}
+              >
               {/* Imagen del juego */}
               <img
                 src={game.image}
@@ -483,32 +593,67 @@ export default function Home({ search = "" }) {
                 </div>
               </div>
 
-              {/* Botón agregar al carrito */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addToCart(game);
-                }}
-                disabled={cart.find((item) => item.id === game.id)}
-                style={{
-                  background: cart.find((item) => item.id === game.id)
-                    ? '#4b6479'
-                    : '#66c0f4',
-                  color: cart.find((item) => item.id === game.id)
-                    ? '#acb4bd'
-                    : '#171a21',
-                  border: 'none',
-                  borderRadius: 4,
-                  padding: '6px 12px',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: cart.find((item) => item.id === game.id) ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {cart.find((item) => item.id === game.id) ? '✓' : '+'}
-              </button>
+              {/* Botones agregar al carrito y remover */}
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(game);
+                  }}
+                  disabled={cart.find((item) => item.id === game.id)}
+                  style={{
+                    background: cart.find((item) => item.id === game.id)
+                      ? '#4b6479'
+                      : '#66c0f4',
+                    color: cart.find((item) => item.id === game.id)
+                      ? '#acb4bd'
+                      : '#171a21',
+                    border: 'none',
+                    borderRadius: 4,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: cart.find((item) => item.id === game.id) ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {cart.find((item) => item.id === game.id) ? '✓' : '+'}
+                </button>
+                
+                {isAdmin && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeGame(game.id);
+                    }}
+                    style={{
+                      background: '#ff6b6b',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 4,
+                      padding: '6px 12px',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Eliminar juego"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
             </div>
+            
+            {/* Línea divisoria persistente entre juegos */}
+            {index < finalList.length - 1 && (
+              <div style={{
+                height: '1px',
+                background: 'linear-gradient(90deg, transparent 0%, #2a475e 50%, transparent 100%)',
+                margin: '8px 0'
+              }} />
+            )}
+          </div>
           ))}
         </div>
 
@@ -521,10 +666,12 @@ export default function Home({ search = "" }) {
             padding: 24,
             minHeight: 600,
             position: "sticky",
-            top: 24
+            top: 24,
+            cursor: hoveredGame ? 'pointer' : 'default'
           }}
           onMouseEnter={handlePanelMouseEnter}
           onMouseLeave={handlePanelMouseLeave}
+          onClick={() => hoveredGame && navigate(`/game/${hoveredGame.id}`, { state: { game: hoveredGame } })}
         >
           {hoveredGame ? (
             <div style={{ height: "100%" }}>
@@ -647,28 +794,50 @@ export default function Home({ search = "" }) {
                   </div>
                 </div>
                 
-                <button
-                  onClick={() => addToCart(hoveredGame)}
-                  disabled={cart.find((item) => item.id === hoveredGame.id)}
-                  style={{
-                    background: cart.find((item) => item.id === hoveredGame.id)
-                      ? '#4b6479'
-                      : 'linear-gradient(90deg, #66c0f4 0%, #417a9b 100%)',
-                    color: cart.find((item) => item.id === hoveredGame.id)
-                      ? '#acb4bd'
-                      : '#171a21',
-                    border: 'none',
-                    borderRadius: 6,
-                    padding: '12px 24px',
-                    fontSize: 16,
-                    fontWeight: 600,
-                    cursor: cart.find((item) => item.id === hoveredGame.id) ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s ease',
-                    minWidth: 150
-                  }}
-                >
-                  {cart.find((item) => item.id === hoveredGame.id) ? 'En el carrito' : 'Agregar al carrito'}
-                </button>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button
+                    onClick={() => addToCart(hoveredGame)}
+                    disabled={cart.find((item) => item.id === hoveredGame.id)}
+                    style={{
+                      background: cart.find((item) => item.id === hoveredGame.id)
+                        ? '#4b6479'
+                        : 'linear-gradient(90deg, #66c0f4 0%, #417a9b 100%)',
+                      color: cart.find((item) => item.id === hoveredGame.id)
+                        ? '#acb4bd'
+                        : '#171a21',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '12px 24px',
+                      fontSize: 16,
+                      fontWeight: 600,
+                      cursor: cart.find((item) => item.id === hoveredGame.id) ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      minWidth: 150
+                    }}
+                  >
+                    {cart.find((item) => item.id === hoveredGame.id) ? 'En el carrito' : 'Agregar al carrito'}
+                  </button>
+                  
+                  {isAdmin && (
+                    <button
+                      onClick={() => removeGame(hoveredGame.id)}
+                      style={{
+                        background: '#ff6b6b',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 6,
+                        padding: '12px 16px',
+                        fontSize: 16,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      title="Eliminar juego"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
