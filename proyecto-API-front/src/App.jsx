@@ -9,6 +9,7 @@ import Checkout from "./pages/checkout";
 import GameDetail from "./pages/GameDetail";
 import AcercaDe from "./pages/AcercaDe";
 import Soporte from "./pages/Soporte";
+import Comunidad from "./pages/Comunidad"; 
 
 export default function App() {
   // Estado y lógica del carrito (subido desde Home)
@@ -128,6 +129,7 @@ export default function App() {
         <Route path="/game/:id" element={<GameDetail />} />
         <Route path="/acerca-de" element={<AcercaDe />} />
         <Route path="/soporte" element={<Soporte />} />
+        <Route path="/comunidad" element={<Comunidad />} />
       </Routes>
     </>
   );
