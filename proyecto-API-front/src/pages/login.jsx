@@ -15,9 +15,15 @@ export default function Login() {
     
     // OBTENER DATOS DEL FORMULARIO
     // Obtener email del input y convertirlo a minúsculas para comparación
-    const email = e.target.email.value.toLowerCase();
+    const email = e.target.email.value.toLowerCase().trim();
     // Obtener contraseña del input tal como fue ingresada
     const password = e.target.password.value;
+    
+    // VALIDACIÓN DE CAMPOS VACÍOS
+    if (!email || !password) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
     
     // VALIDACIÓN DE CREDENCIALES DE ADMINISTRADOR
     // Verificar si las credenciales coinciden con el admin hardcodeado
@@ -25,18 +31,43 @@ export default function Login() {
       // AUTENTICACIÓN EXITOSA PARA ADMIN
       // Guardar en localStorage que el usuario es administrador
       localStorage.setItem("isAdmin", "true");
+      localStorage.setItem("currentUser", JSON.stringify({
+        name: "Administrador",
+        email: "admin@admin",
+        isAdmin: true
+      }));
       // Redirigir a la página principal usando navegación nativa del navegador
       window.location.href = "/";
       // Terminar ejecución de la función aquí
       return;
     }
     
-    // MANEJAR OTROS USUARIOS (placeholder para futuras implementaciones)
-    // Si quieres agregar lógica para otros usuarios, aquí 
+    // VALIDACIÓN DE CREDENCIALES DE USUARIOS REGISTRADOS
+    // Obtener lista de usuarios del localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Buscar usuario con email y contraseña coincidentes
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (user) {
+      // AUTENTICACIÓN EXITOSA PARA USUARIO REGISTRADO
+      // Limpiar flag de admin ya que es usuario regular
+      localStorage.removeItem("isAdmin");
+      // Guardar información del usuario actual
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isAdmin: false
+      }));
+      // Redirigir a la página principal
+      window.location.href = "/";
+      return;
+    }
     
     // CREDENCIALES INCORRECTAS
-    // Mostrar alerta si las credenciales no coinciden con admin
-    alert("Credenciales incorrectas");
+    // Mostrar alerta si ninguna credencial coincide
+    alert("Email o contraseña incorrectos");
   };
 
   return (

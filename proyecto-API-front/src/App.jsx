@@ -125,6 +125,8 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Home addToCart={addToCart} cart={cart} />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/game/:id" element={<GameDetail />} />
         <Route path="/acerca-de" element={<AcercaDe />} />

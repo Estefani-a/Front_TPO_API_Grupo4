@@ -33,6 +33,19 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
   const navigate = useNavigate();
   const location = useLocation();
   const isAdmin = typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true';
+  
+  // Obtener información del usuario actual
+  const getCurrentUser = () => {
+    try {
+      const currentUser = localStorage.getItem('currentUser');
+      return currentUser ? JSON.parse(currentUser) : null;
+    } catch {
+      return null;
+    }
+  };
+  
+  const currentUser = getCurrentUser();
+  const isLoggedIn = currentUser !== null;
   const [showAddModal, setShowAddModal] = React.useState(false);
   const [form, setForm] = React.useState({
     title: '',
@@ -55,22 +68,92 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
   // Handlers de formularios del popup
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    const email = e.target.email.value.toLowerCase();
+    const email = e.target.email.value.toLowerCase().trim();
     const password = e.target.password.value;
+    
+    // Validar campos vacíos
+    if (!email || !password) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
+    
+    // Verificar credenciales de admin
     if (email === 'admin@admin' && password === 'admin') {
       localStorage.setItem('isAdmin', 'true');
+      localStorage.setItem('currentUser', JSON.stringify({
+        name: "Administrador",
+        email: "admin@admin",
+        isAdmin: true
+      }));
       setShowLogin(false);
       // Refrescar para que el header tome el estado admin inmediatamente
       window.location.reload();
       return;
     }
-    alert('Credenciales incorrectas');
+    
+    // Verificar credenciales de usuarios registrados
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (user) {
+      localStorage.removeItem('isAdmin');
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isAdmin: false
+      }));
+      setShowLogin(false);
+      window.location.reload();
+      return;
+    }
+    
+    alert('Email o contraseña incorrectos');
   };
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
-    // Aquí podrías guardar en API/LocalStorage; por ahora, feedback y cambio a login
-    alert('Cuenta creada. Ahora puedes iniciar sesión.');
+    const name = e.target.name.value.trim();
+    const email = e.target.email.value.toLowerCase().trim();
+    const password = e.target.password.value;
+    const confirmPassword = e.target.confirmPassword.value;
+    
+    // Validaciones
+    if (!name || !email || !password || !confirmPassword) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+    
+    if (password.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+    
+    // Verificar si el usuario ya existe
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    if (existingUsers.find(user => user.email === email)) {
+      alert("Este email ya está registrado");
+      return;
+    }
+    
+    // Crear nuevo usuario
+    const newUser = {
+      id: Date.now(),
+      name,
+      email,
+      password,
+      createdAt: new Date().toISOString()
+    };
+    
+    existingUsers.push(newUser);
+    localStorage.setItem('users', JSON.stringify(existingUsers));
+    
+    alert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.');
     setShowRegister(false);
     setShowLogin(true);
   };
@@ -324,18 +407,26 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
           )}
           
           {/* Botones admin/login/register */}
-          {isAdmin ? (
+          {isLoggedIn ? (
             <div
               style={{ display: 'flex', alignItems: 'center', height: '60px', cursor: 'pointer', position: 'relative' }}
               onMouseEnter={() => setShowUserDropdown(true)}
               onMouseLeave={() => setShowUserDropdown(false)}
             >
-              <span title="Admin">
-                <svg width="28" height="28" fill="white" viewBox="0 0 24 24" style={{ display: 'block', margin: 'auto' }}>
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" />
-                </svg>
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span title={currentUser.name}>
+                  <svg width="28" height="28" fill="white" viewBox="0 0 24 24" style={{ display: 'block', margin: 'auto' }}>
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" />
+                  </svg>
+                </span>
+                <span style={{ color: '#66c0f4', fontSize: 14, fontWeight: 500 }}>
+                  {currentUser.name}
+                  {currentUser.isAdmin && (
+                    <span style={{ color: '#90ba3c', marginLeft: 4, fontSize: 12 }}>(Admin)</span>
+                  )}
+                </span>
+              </div>
               {showUserDropdown && (
                 <div
                   className="user-dropdown"
@@ -349,11 +440,14 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
                     boxShadow: '0 8px 24px rgba(0,0,0,0.3)', 
                     border: '1px solid #3d414a',
                     padding: '12px 0', 
-                    minWidth: 140, 
+                    minWidth: 180, 
                     zIndex: 100, 
                     fontSize: 15
                   }}
                 >
+                  <div style={{ padding: '8px 20px', borderBottom: '1px solid #3d414a', color: '#c7d5e0', fontSize: 13 }}>
+                    {currentUser.email}
+                  </div>
                   <div
                     style={{ 
                       padding: '12px 20px', 
@@ -361,7 +455,11 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
                       transition: 'background 0.2s',
                       ':hover': { background: '#2a475e' }
                     }}
-                    onClick={() => { localStorage.removeItem('isAdmin'); window.location.reload(); }}
+                    onClick={() => { 
+                      localStorage.removeItem('isAdmin'); 
+                      localStorage.removeItem('currentUser'); 
+                      window.location.reload(); 
+                    }}
                     onMouseEnter={(e) => e.target.style.background = '#2a475e'}
                     onMouseLeave={(e) => e.target.style.background = 'transparent'}
                   >
@@ -456,11 +554,11 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
               </div>
               <div className="auth-form-group">
                 <label htmlFor="reg-password" style={{ color: 'rgba(255,255,255,0.9)' }}>Contraseña</label>
-                <input id="reg-password" name="password" type="password" placeholder="********" required />
+                <input id="reg-password" name="password" type="password" placeholder="********" required minLength="6" />
               </div>
               <div className="auth-form-group">
                 <label htmlFor="confirmPassword" style={{ color: 'rgba(255,255,255,0.9)' }}>Confirmar Contraseña</label>
-                <input id="confirmPassword" name="confirmPassword" type="password" placeholder="********" required />
+                <input id="confirmPassword" name="confirmPassword" type="password" placeholder="********" required minLength="6" />
               </div>
               <button type="submit" className="auth-btn">Crear cuenta</button>
             </form>
