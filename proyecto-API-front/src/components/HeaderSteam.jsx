@@ -101,23 +101,23 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
           <nav style={{ display: "flex", gap: 24 }}>
             <a
               href="#"
+              className="header-link"
               onClick={e => { e.preventDefault(); navigate("/"); }}
-              style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}
             >
               TIENDA
             </a>
-            <a href="#" style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}>COMUNIDAD</a>
+            <a href="#" className="header-link">COMUNIDAD</a>
             <a
               href="#"
+              className="header-link"
               onClick={e => { e.preventDefault(); navigate("/acerca-de"); }}
-              style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}
             >
               ACERCA DE
             </a>
             <a
               href="#"
+              className="header-link"
               onClick={e => { e.preventDefault(); navigate("/soporte"); }}
-              style={{ color: "#c7d5e0", textDecoration: "none", fontSize: 15, fontWeight: 500 }}
             >
               SOPORTE
             </a>
