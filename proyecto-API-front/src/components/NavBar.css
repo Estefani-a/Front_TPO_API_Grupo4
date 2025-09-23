@@ -1,3 +1,11 @@
+/* Aumenta la especificidad para que el subrayado del link activo siempre se muestre */
+.header-link.header-link-active,
+.header-link-active {
+  color: #fff !important;
+  text-shadow: 0 0 8px #66c0f4;
+  text-decoration: underline !important;
+  text-underline-offset: 4px;
+}
 /* Header nav links hover effect (igual que navbar-link:hover) */
 .header-link {
   color: #c7d5e0;

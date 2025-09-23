@@ -1,6 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../pages/auth.css";
+import "./NavBar.css";
 
 const steamLogo = "https://store.cloudflare.steamstatic.com/public/shared/images/header/logo_steam.svg?t=962016";
 
@@ -30,6 +31,7 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
     return Array.from(new Set(tags));
   };
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdmin = typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true';
   const [showAddModal, setShowAddModal] = React.useState(false);
   const [form, setForm] = React.useState({
@@ -101,22 +103,28 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
           <nav style={{ display: "flex", gap: 24 }}>
             <a
               href="#"
-              className="header-link"
+              className={`header-link${location.pathname === '/' ? ' header-link-active' : ''}`}
               onClick={e => { e.preventDefault(); navigate("/"); }}
             >
               TIENDA
             </a>
-            <a href="#" className="header-link">COMUNIDAD</a>
             <a
               href="#"
-              className="header-link"
+              className={`header-link${location.pathname === '/comunidad' ? ' header-link-active' : ''}`}
+              onClick={e => { e.preventDefault(); navigate("/comunidad"); }}
+            >
+              COMUNIDAD
+            </a>
+            <a
+              href="#"
+              className={`header-link${location.pathname === '/acerca-de' ? ' header-link-active' : ''}`}
               onClick={e => { e.preventDefault(); navigate("/acerca-de"); }}
             >
               ACERCA DE
             </a>
             <a
               href="#"
-              className="header-link"
+              className={`header-link${location.pathname === '/soporte' ? ' header-link-active' : ''}`}
               onClick={e => { e.preventDefault(); navigate("/soporte"); }}
             >
               SOPORTE
