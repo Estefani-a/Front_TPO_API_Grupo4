@@ -327,135 +327,129 @@ body {
   font-size: 12px;
   margin-top: auto;
   border-top: 1px solid #2d3544;
+  position: relative; /* permite posicionar los íconos respecto al footer completo */
 }
 
-/* checkout */
-
-.auth-checkout-summary {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 1.5rem;
-  border-radius: 15px;
-  margin-bottom: 2rem;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+/* Variante transparente del footer */
+.auth-footer--transparent {
+  background: transparent !important;
+  border-top: none !important;
+  color: rgba(255, 255, 255, 0.85); /* mejora contraste sobre fondos oscuros */
 }
 
-.auth-form-row {
-  display: flex;
-  gap: 1rem;
+/* Variante con color del carrusel/panel (#23262e) */
+.auth-footer--panel {
+  background: #23262e !important;
+  color: #c7d5e0 !important;
+  border-top: none !important; /* sin línea superior */
 }
 
-.auth-form-row .form-group {
-  flex: 1;
-}
-
-/* contenedor de checkout */
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  height: auto;
-  padding: 32px;
-  overflow-y: auto;
-}
-
-.auth-form-card {
-  margin: 32px auto;
-  max-height: none;
-  overflow: visible;
-  position: relative;
-}
-
-/*formulario de checkout */
-.auth-form {
-  overflow: visible;
-  position: relative;
-}
-
-.auth-select {
-  width: 100%;
-  padding: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background: #171a21; 
-  backdrop-filter: blur(10px);
-  box-sizing: border-box;
-  color: rgba(255, 255, 255, 0.95);
-  appearance: none;
-  cursor: pointer;
-}
-
-/* Estilo para las opciones del select */
-.auth-select option {
-  background-color: #171a21; 
-  color: rgba(255, 255, 255, 0.95);
-  padding: 12px;
-}
-
-.auth-select:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 
-    0 0 0 3px rgba(255, 255, 255, 0.1),
-    0 8px 25px rgba(0, 0, 0, 0.15);
-  background: #171a21;
-}
-
-/* Estilos específicos para checkout */
-.auth-body {
-  overflow-x: hidden;
-}
-
-.auth-container {
-  min-height: 100vh;
-  padding: 2rem;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.auth-form-card {
+/* Distribución del contenido del footer: mantener el texto centrado */
+.auth-footer__inner {
+  position: static; /* sin posicionamiento relativo: los íconos se alinean respecto al footer */
+  max-width: 1200px;
   margin: 0 auto;
-  width: 100%;
-  max-width: 600px;
-  height: auto;
-  min-height: min-content;
-  position: relative;
-  overflow-y: visible;
-  padding: 3rem 2rem;
 }
 
-.auth-form-group {
-  position: relative;
-  z-index: 1;
+/* El texto queda centrado porque el footer padre usa text-align: center */
+.auth-footer__text {
+  display: inline-block;
 }
 
-.auth-select {
-  position: relative;
-  z-index: 2;
+/* Contenedor de íconos sociales alineado a la derecha del footer */
+.auth-footer__social {
+  position: absolute;
+  right: 20px; /* separado del borde derecho */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-/* Ajustes para el contenido que se expande */
-.auth-form {
-  position: relative;
-  z-index: 1;
-  height: auto;
-  min-height: min-content;
+.auth-footer__social a {
+  color: #8F98A0; /* color base del texto del footer */
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.auth-checkout-summary {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 2rem;
+.auth-footer__social a:hover,
+.auth-footer__social a:focus-visible {
+  color: #66c0f4; /* azul estilo Steam al hacer hover */
+  transform: translateY(-1px);
 }
 
-.auth-h2 {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 2rem;
+/* Aumenta ligeramente el área táctil en dispositivos touch */
+@media (pointer: coarse) {
+  .auth-footer__social a {
+    padding: 6px;
+  }
+}
+
+/* checkout: estilos migrados a src/pages/checkout.css */
+
+/* --- Overlay del pop-up de autenticación ---
+   Ocupa toda la pantalla. Si se hace click aquí, se cierra el modal.
+   Tiene el mismo gradiente animado que las pantallas de login/register.
+*/
+.auth-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(-45deg, #04addc, #89dcf0, #2a454a, #0a5891, #142a3a);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+}
+
+/* Fondo del panel del modal
+   Aplica el gradiente (animado) al cuadro del popup. 
+   Usamos la combinación ".cart-popup.auth-popup-panel" para aumentar especificidad
+   y sobreescribir el background por defecto de .cart-popup definido en NavBar.css.
+*/
+.auth-popup-panel,
+.cart-popup.auth-popup-panel {
+  background: linear-gradient(-45deg, #04addc, #89dcf0, #2a454a, #0a5891, #142a3a);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Variante estática (sin animación)
+   Útil si se prefiere el gradiente fijo.
+*/
+.auth-popup-panel--static,
+.cart-popup.auth-popup-panel--static {
+  background: linear-gradient(-45deg, #04addc, #89dcf0, #2a454a, #0a5891, #142a3a);
+  background-size: cover;
+  animation: none;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Scrollbar del popup (Registro/Login) - tonos celestes
+   Aplica a elementos con overflow (p. ej. Register con max-height y overflowY:auto) */
+.cart-popup.auth-popup-panel {
+  /* Firefox */
+  scrollbar-width: thin; /* thin | auto | none */
+  scrollbar-color: #43a2da rgba(20, 42, 58, 0.35); /* thumb | track */
+}
+
+/* Chrome, Edge, Safari (WebKit) */
+.cart-popup.auth-popup-panel::-webkit-scrollbar {
+  width: 10px;
+}
+.cart-popup.auth-popup-panel::-webkit-scrollbar-track {
+  background: rgba(20, 42, 58, 0.35); /* azul profundo translúcido */
+  border-radius: 12px;
+}
+.cart-popup.auth-popup-panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #04addc 0%, #0a5891 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(20, 42, 58, 0.35); /* crea separación visual */
+}
+.cart-popup.auth-popup-panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #66c0f4 0%, #0a74bf 100%);
 }

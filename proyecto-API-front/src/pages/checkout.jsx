@@ -1,7 +1,11 @@
+// Página de Checkout: muestra el resumen y el formulario de pago
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+// Estilos compartidos (tipografías, base) y estilos específicos del checkout
 import "./auth.css";
+import "./checkout.css";
 
+// Enumeración simple para los métodos de pago soportados
 const PaymentMethods = {
   CREDIT_CARD: 'credit_card',
   PAYPAL: 'paypal',
@@ -9,10 +13,13 @@ const PaymentMethods = {
 };
 
 export default function Checkout() {
+  // Hooks de navegación y recepción de datos desde la ruta anterior
   const location = useLocation();
   const navigate = useNavigate();
+  // Recibimos el carrito y total desde el estado de la navegación (fallback si no viene nada)
   const { cart, total } = location.state || { cart: [], total: 0 };
   
+  // Estado local del formulario de pago
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -24,6 +31,7 @@ export default function Checkout() {
     cryptoWallet: '',
   });
 
+  // Maneja cambios en cualquier input/select del formulario
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -31,6 +39,7 @@ export default function Checkout() {
     });
   };
 
+  // Submit simulado del checkout; aquí iría la integración real con un procesador de pago
   const handleSubmit = (e) => {
     e.preventDefault();
     // Aquí iría la lógica de procesamiento del pago
@@ -39,108 +48,27 @@ export default function Checkout() {
   };
 
   return (
-    <div style={{ 
-      width: '100%',
-      minHeight: '100vh',
-      position: 'relative',
-      padding: '2rem'
-    }}>
-      {/* Botón Volver*/}
-      <button 
-        onClick={() => navigate('/')}
-        style={{
-          position: 'fixed',
-          left: '2rem',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          background: 'rgba(23, 26, 33, 0.95)',
-          border: '2px solid #355166',
-          color: '#66c0f4',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          cursor: 'pointer',
-          padding: '10px 20px',
-          borderRadius: '20px',
-          transition: 'all 0.3s ease',
-          zIndex: 100,
-          fontSize: '0.9rem',
-          fontWeight: '600',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.background = '#23303f';
-          e.target.style.borderColor = '#66c0f4';
-          e.target.style.transform = 'translateY(-50%) translateX(5px)';
-          e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.background = 'rgba(23, 26, 33, 0.95)';
-          e.target.style.borderColor = '#355166';
-          e.target.style.transform = 'translateY(-50%)';
-          e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-        }}
-      >
-        ←
-      </button>
+    <div className="checkout-root">
+      {/* Botón Volver: regresa al Home */}
+      <button className="checkout-back-btn" onClick={() => navigate('/')}>←</button>
 
-      <div className="container" style={{ 
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        overflowY: 'auto',
-        overflowX: 'hidden'
-      }}>
-        <div className="form-card" style={{ 
-          margin: '0 auto',
-          width: '100%',
-          maxWidth: '600px',
-          height: 'auto',
-          minHeight: 'min-content',
-          position: 'relative',
-          overflowY: 'visible',
-          padding: '3rem 2rem'
-        }}>
+      <div className="checkout-container">
+        <div className="checkout-card">
+          {/* Resumen centrado del total a pagar */}
           <div className="checkout-summary">
-            <h3 style={{ 
-              color: 'rgba(255, 255, 255, 0.9)', 
-              marginBottom: '12px',
-              fontSize: '1.3rem' 
-            }}>
-              Resumen de la compra
-            </h3>
-            <div style={{
-              background: 'rgba(102, 192, 244, 0.15)',
-              padding: '15px',
-              borderRadius: '10px',
-              border: '2px solid #66c0f4',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <span style={{ 
-                color: 'white',
-                fontSize: '1.2rem',
-                fontWeight: '500'
-              }}>
-                Total a pagar:
-              </span>
-              <span style={{
-                color: '#fff',
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                textShadow: '0 0 10px rgba(102, 192, 244, 0.5)'
-              }}>
-                ${total.toFixed(2)}
-              </span>
+            <h3 className="checkout-summary-title">Resumen de la compra</h3>
+            <div className="checkout-summary-box">
+              <span className="checkout-summary-label">Total a pagar:</span>
+              <span className="checkout-summary-total">${total.toFixed(2)}</span>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
+          {/* Formulario de datos del comprador y método de pago */}
+          <form onSubmit={handleSubmit} className="checkout-form">
+            <div className="checkout-form-group">
               <label>Nombre completo</label>
               <input
+                className="checkout-input"
                 type="text"
                 name="fullName"
                 value={formData.fullName}
@@ -149,9 +77,11 @@ export default function Checkout() {
               />
             </div>
 
-            <div className="form-group">
+            {/* E-mail de contacto*/}
+            <div className="checkout-form-group">
               <label>Email</label>
               <input
+                className="checkout-input"
                 type="email"
                 name="email"
                 value={formData.email}
@@ -160,9 +90,11 @@ export default function Checkout() {
               />
             </div>
 
-            <div className="form-group">
+            {/* Dirección de facturación / envío */}
+            <div className="checkout-form-group">
               <label>Dirección</label>
               <input
+                className="checkout-input"
                 type="text"
                 name="address"
                 value={formData.address}
@@ -171,9 +103,11 @@ export default function Checkout() {
               />
             </div>
 
-            <div className="form-group">
+            {/* Selección del método de pago */}
+            <div className="checkout-form-group">
               <label>Método de pago</label>
               <select
+                className="checkout-select"
                 name="paymentMethod"
                 value={formData.paymentMethod}
                 onChange={handleInputChange}
@@ -186,9 +120,11 @@ export default function Checkout() {
 
             {formData.paymentMethod === PaymentMethods.CREDIT_CARD && (
               <>
-                <div className="form-group">
+                {/* Campos de tarjeta: número, expiración y CVV */}
+                <div className="checkout-form-group">
                   <label>Número de tarjeta</label>
                   <input
+                    className="checkout-input"
                     type="text"
                     name="cardNumber"
                     value={formData.cardNumber}
@@ -197,10 +133,11 @@ export default function Checkout() {
                     required
                   />
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
+                <div className="checkout-form-row">
+                  <div className="checkout-form-group">
                     <label>Fecha de expiración</label>
                     <input
+                      className="checkout-input"
                       type="text"
                       name="expiryDate"
                       value={formData.expiryDate}
@@ -209,9 +146,10 @@ export default function Checkout() {
                       required
                     />
                   </div>
-                  <div className="form-group">
+                  <div className="checkout-form-group">
                     <label>CVV</label>
                     <input
+                      className="checkout-input"
                       type="text"
                       name="cvv"
                       value={formData.cvv}
@@ -225,9 +163,11 @@ export default function Checkout() {
             )}
 
             {formData.paymentMethod === PaymentMethods.CRYPTO && (
-              <div className="form-group">
+              // Campo visible sólo si se elige Criptomoneda
+              <div className="checkout-form-group">
                 <label>Dirección de wallet</label>
                 <input
+                  className="checkout-input"
                   type="text"
                   name="cryptoWallet"
                   value={formData.cryptoWallet}
@@ -237,59 +177,10 @@ export default function Checkout() {
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '24px' }}>
-              <button 
-                type="submit" 
-                style={{
-                  flex: 1,
-                  height: '52px',
-                  background: 'linear-gradient(135deg, #04addc 0%, #0a5891 100%)',
-                  border: 'none',
-                  borderRadius: '12px',
-                  color: 'white',
-                  fontSize: '1.1rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0 2rem'
-                }}
-              >
-                Confirmar Compra
-              </button>
-              
-              <button 
-                type="button" 
-                onClick={() => navigate('/')}
-                style={{
-                  flex: 1,
-                  height: '52px',
-                  background: '#1a2530',
-                  border: '2px solid #355166',
-                  borderRadius: '12px',
-                  color: '#66c0f4',
-                  fontSize: '1.1rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0 2rem'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = '#23303f';
-                  e.target.style.borderColor = '#66c0f4';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = '#1a2530';
-                  e.target.style.borderColor = '#355166';
-                }}
-              >
-                Cancelar Compra
-              </button>
+            {/* Acciones del formulario */}
+            <div className="checkout-actions">
+              <button type="submit" className="checkout-confirm-btn">Confirmar Compra</button>
+              <button type="button" className="checkout-cancel-btn" onClick={() => navigate('/')}>Cancelar Compra</button>
             </div>
           </form>
         </div>

@@ -863,8 +863,48 @@ export default function Home({ search = "" }) {
         </div>
       </div>
 
-      <footer className="footer" style={{ background: "transparent" }}>
-        © 2025 Grupo 4. Todos los derechos reservados.
+      <footer className="auth-footer auth-footer--panel">
+        <div className="auth-footer__inner">
+          <span className="auth-footer__text">© 2025 Grupo 4. Todos los derechos reservados.</span>
+          <div className="auth-footer__social" aria-label="Redes sociales">
+            {/* Facebook */}
+            <a
+              href="https://www.facebook.com/Steam"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              title="Facebook"
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 5.02 3.66 9.19 8.44 9.93v-7.02H7.9v-2.91h2.54V9.41c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.91h-2.34V22c4.78-.74 8.44-4.91 8.44-9.93z" fill="currentColor"/>
+              </svg>
+            </a>
+            {/* X (Twitter) */}
+            <a
+              href="https://twitter.com/steam"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (Twitter)"
+              title="X (Twitter)"
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="M18.244 2H21L14.327 9.62 22 22h-6.2l-4.853-7.53L5.4 22H2.64l7.2-8.3L2 2h6.31l4.38 6.77L18.244 2Zm-2.166 18.4h1.2L7.98 3.6H6.72l9.358 16.8Z" fill="currentColor"/>
+              </svg>
+            </a>
+            {/* Bluesky */}
+            <a
+              href="https://bsky.app/profile/steampowered.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Bluesky"
+              title="Bluesky"
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="M12 10.6c-2.3-3.4-6.3-6.9-8.3-7.5C1.6 2.5 1 3.5 1 5c0 3.5 2.3 5.6 4.5 7-2.2.9-4.1 2.5-4.1 5 0 1.2.5 2 1.4 2.2 2 .4 6.4-3 9.2-6.7 2.8 3.7 7.2 7.1 9.2 6.7.9-.2 1.4-1 1.4-2.2 0-2.5-1.9-4.1-4.1-5 2.2-1.4 4.5-3.5 4.5-7 0-1.5-.6-2.5-2.7-1.9-2 .6-6 4-8.3 7.5Z" fill="currentColor"/>
+              </svg>
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );
