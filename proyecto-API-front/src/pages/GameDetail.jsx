@@ -61,6 +61,10 @@ export default function GameDetail() {
   const [activeTab, setActiveTab] = useState("desc"); // Tab activa: "desc" o "reviews"
   const [cart, setCart] = useState([]); // Estado del carrito de compras
   const [activeImageIndex, setActiveImageIndex] = useState(0); // Índice de imagen activa en carrusel
+  const [comments, setComments] = useState([]); // Comentarios desde la API
+  const [stats, setStats] = useState({ totalComments: 0, averageRating: 0 }); // Estadísticas
+  const [showCommentForm, setShowCommentForm] = useState(false); // Mostrar formulario
+  const [newComment, setNewComment] = useState({ userName: '', content: '', rating: 5 }); // Nuevo comentario
 
   // FUNCIONES PARA EL CARRUSEL DE IMÁGENES
   
@@ -79,15 +83,59 @@ export default function GameDetail() {
     setActiveImageIndex(index);
   };
 
-  // DATOS DE EJEMPLO PARA RESEÑAS
-  // Array estático con reseñas simuladas con diferentes calificaciones
-  const sampleReviews = [
-    { user: "GamerPro2024", comment: "Me divertí jugándolo, muy bueno", rating: 5 },
-    { user: "SteamUser", comment: "Excelente juego, lo recomiendo totalmente", rating: 5 },
-    { user: "PlayerOne", comment: "Está bueno pero le falta contenido", rating: 4 },
-    { user: "Juan123", comment: "Entretenido, aunque esperaba más", rating: 3},
-    { user: "user_pro", comment: "No puedo parar de jugar", rating: 5 }
-  ];
+  // CARGAR COMENTARIOS DESDE LA API
+  useEffect(() => {
+    if (!game?.id) return;
+
+    // Obtener comentarios del juego
+    fetch(`http://localhost:8080/comments/game/${game.id}`)
+      .then(res => res.json())
+      .then(data => setComments(data))
+      .catch(err => console.error('Error al cargar comentarios:', err));
+
+    // Obtener estadísticas
+    fetch(`http://localhost:8080/comments/game/${game.id}/stats`)
+      .then(res => res.json())
+      .then(data => setStats(data))
+      .catch(err => console.error('Error al cargar estadísticas:', err));
+  }, [game?.id]);
+
+  // FUNCIÓN PARA ENVIAR COMENTARIO
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+    
+    if (!newComment.userName || !newComment.content) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/comments/game/${game.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newComment)
+      });
+
+      if (response.ok) {
+        const created = await response.json();
+        setComments([...comments, created]);
+        setNewComment({ userName: '', content: '', rating: 5 });
+        setShowCommentForm(false);
+        
+        // Recargar estadísticas
+        const statsRes = await fetch(`http://localhost:8080/comments/game/${game.id}/stats`);
+        const newStats = await statsRes.json();
+        setStats(newStats);
+        
+        alert('¡Comentario agregado exitosamente!');
+      } else {
+        alert('Error al agregar comentario');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al conectar con el servidor');
+    }
+  };
 
   // EFECTO PARA GESTIONAR EL CARRITO
   useEffect(() => {
@@ -299,7 +347,10 @@ export default function GameDetail() {
 
           {/* SECCIÓN DE CALIFICACIÓN GENERAL */}
           <div className="rating-section">
-            <OverallRating rating={4.5} />
+            <OverallRating rating={stats.averageRating || 0} />
+            <p style={{ textAlign: 'center', color: '#8f98a0', fontSize: '14px', marginTop: '8px' }}>
+              {stats.totalComments} {stats.totalComments === 1 ? 'comentario' : 'comentarios'}
+            </p>
           </div>
 
           {/* SECCIÓN DE PRECIO Y BOTONES */}
@@ -346,7 +397,7 @@ export default function GameDetail() {
               className={`gd-tab ${activeTab === "reviews" ? "gd-tab--active" : ""}`}
               onClick={() => setActiveTab("reviews")}
             >
-              Reseñas ({sampleReviews.length})
+              Reseñas ({comments.length})
             </button>
           </div>
 
@@ -368,18 +419,168 @@ export default function GameDetail() {
           ) : (
             // CONTENIDO DE RESEÑAS
             <div className="game-reviews">
-              {sampleReviews.map((review, idx) => (
-                <div key={idx} className="review">
-                  {/* HEADER DE LA RESEÑA */}
-                  <div className="review-header">
-                    <strong className="review-user">{review.user}</strong>
-                    {/* Componente de estrellas para esta reseña */}
-                    <ReviewStars rating={review.rating} />
+              {/* Botón para agregar comentario */}
+              {!showCommentForm && (
+                <button 
+                  onClick={() => setShowCommentForm(true)}
+                  style={{
+                    background: 'linear-gradient(90deg, #66c0f4 0%, #417a9b 100%)',
+                    color: '#171a21',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '10px 20px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    marginBottom: '20px',
+                    width: '100%'
+                  }}
+                >
+                  ✏️ Escribir un comentario
+                </button>
+              )}
+
+              {/* Formulario para nuevo comentario */}
+              {showCommentForm && (
+                <form onSubmit={handleSubmitComment} style={{
+                  background: '#2a475e',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  marginBottom: '20px'
+                }}>
+                  <h3 style={{ color: '#66c0f4', marginBottom: '15px' }}>Nuevo Comentario</h3>
+                  
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', color: '#c7d5e0', marginBottom: '5px' }}>
+                      Tu nombre
+                    </label>
+                    <input
+                      type="text"
+                      value={newComment.userName}
+                      onChange={(e) => setNewComment({...newComment, userName: e.target.value})}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: '#171a21',
+                        border: '1px solid #3a4d5c',
+                        borderRadius: '4px',
+                        color: '#fff'
+                      }}
+                      placeholder="Ingresa tu nombre"
+                    />
                   </div>
-                  {/* COMENTARIO DE LA RESEÑA */}
-                  <p className="review-comment">{review.comment}</p>
-                </div>
-              ))}
+
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', color: '#c7d5e0', marginBottom: '5px' }}>
+                      Calificación
+                    </label>
+                    <select
+                      value={newComment.rating}
+                      onChange={(e) => setNewComment({...newComment, rating: parseInt(e.target.value)})}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: '#171a21',
+                        border: '1px solid #3a4d5c',
+                        borderRadius: '4px',
+                        color: '#fff'
+                      }}
+                    >
+                      <option value={5}>⭐⭐⭐⭐⭐ (5 estrellas)</option>
+                      <option value={4}>⭐⭐⭐⭐ (4 estrellas)</option>
+                      <option value={3}>⭐⭐⭐ (3 estrellas)</option>
+                      <option value={2}>⭐⭐ (2 estrellas)</option>
+                      <option value={1}>⭐ (1 estrella)</option>
+                    </select>
+                  </div>
+
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', color: '#c7d5e0', marginBottom: '5px' }}>
+                      Tu comentario
+                    </label>
+                    <textarea
+                      value={newComment.content}
+                      onChange={(e) => setNewComment({...newComment, content: e.target.value})}
+                      required
+                      rows={4}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: '#171a21',
+                        border: '1px solid #3a4d5c',
+                        borderRadius: '4px',
+                        color: '#fff',
+                        resize: 'vertical'
+                      }}
+                      placeholder="Escribe tu opinión sobre el juego..."
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button 
+                      type="submit"
+                      style={{
+                        flex: 1,
+                        background: '#66c0f4',
+                        color: '#171a21',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '10px',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                      }}
+                    >
+                      Enviar Comentario
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setShowCommentForm(false);
+                        setNewComment({ userName: '', content: '', rating: 5 });
+                      }}
+                      style={{
+                        flex: 1,
+                        background: '#c1272d',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '10px',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Lista de comentarios */}
+              {comments.length === 0 ? (
+                <p style={{ color: '#8f98a0', textAlign: 'center', padding: '20px' }}>
+                  No hay comentarios aún. ¡Sé el primero en comentar!
+                </p>
+              ) : (
+                comments.map((review) => (
+                  <div key={review.id} className="review">
+                    {/* HEADER DE LA RESEÑA */}
+                    <div className="review-header">
+                      <strong className="review-user">{review.userName}</strong>
+                      {/* Componente de estrellas para esta reseña */}
+                      <ReviewStars rating={review.rating} />
+                    </div>
+                    {/* COMENTARIO DE LA RESEÑA */}
+                    <p className="review-comment">{review.content}</p>
+                    <p style={{ fontSize: '12px', color: '#8f98a0', marginTop: '8px' }}>
+                      {new Date(review.createdAt).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>

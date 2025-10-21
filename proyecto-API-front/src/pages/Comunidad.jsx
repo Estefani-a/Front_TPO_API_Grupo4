@@ -11,7 +11,7 @@ async function http(method, path, body) {
     method,
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
-    credentials: "include",
+    // credentials: "include", // Comentado para evitar conflicto CORS con wildcard
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -187,18 +187,56 @@ function delay(ms) {
 }
 
 /** ------------------------------
+ * Transformar datos del backend al formato del frontend
+ * ------------------------------ */
+function transformBackendPost(post) {
+  return {
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    imageUrl: post.imageUrl || "",
+    createdAt: post.createdAt,
+    likesCount: post.likes || 0,
+    likedByMe: false,
+    author: { id: post.authorName, name: post.authorName, avatarUrl: null },
+    comments: (post.comments || []).map(c => ({
+      id: c.id,
+      text: c.content,
+      createdAt: c.createdAt,
+      author: { id: c.userName, name: c.userName, avatarUrl: null }
+    }))
+  };
+}
+
+/** ------------------------------
  * Capa de servicios (elige API real o local)
  * ------------------------------ */
 const useLocal = !API_BASE; // si no hay VITE_API_URL → usa local
+console.log("🔧 API_BASE:", API_BASE);
+console.log("🔧 useLocal:", useLocal);
+
 async function listPosts() {
-  if (useLocal) return localApi.list();
-  try {
-    const data = await http("GET", "/community/posts");
-    if (Array.isArray(data) && data.length) return data;
-    // si viene vacío del server, igual mostramos seed local
+  console.log("📡 listPosts() - useLocal:", useLocal);
+  if (useLocal) {
+    console.log("📦 Usando localStorage");
     return localApi.list();
-  } catch {
+  }
+  try {
+    console.log("🌐 Llamando a API:", `${API_BASE}/community/posts`);
+    const data = await http("GET", "/community/posts");
+    console.log("✅ Datos recibidos del backend:", data);
+    if (Array.isArray(data) && data.length) {
+      // Transformar datos del backend al formato esperado
+      const transformed = data.map(transformBackendPost);
+      console.log("🔄 Datos transformados:", transformed);
+      return transformed;
+    }
+    // si viene vacío del server, igual mostramos seed local
+    console.log("⚠️ Backend vacío, usando localStorage");
+    return localApi.list();
+  } catch (error) {
     // si falla server, fallback local
+    console.error("❌ Error al llamar API, usando localStorage:", error);
     return localApi.list();
   }
 }
