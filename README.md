@@ -58,6 +58,7 @@ proyecto-API-front/
 │   │   ├── auth.css      # Estilos de autenticación
 │   │   ├── cart.jsx      # Página de carrito
 │   │   ├── checkout.jsx  # Página de compra
+|   |   ├── comunidad,jsx 
 |   |   ├── GameDetail.jsx #Informacion del juego
 │   │   ├── home.jsx      # Página principal
 │   │   ├── login.jsx     # Página de login
