@@ -8,7 +8,7 @@ import SteamCarousel from "../components/SteamCarousel";
    DB local con datos expandidos para la nueva interfaz Steam
    ========================= */
 const gamesList = [
-  {
+  /*{
     id: 1,
     title: "Counter-Strike 2",
     price: 499.99,
@@ -146,7 +146,7 @@ const gamesList = [
     tags: ["RPG", "Estrategia", "D&D", "Fantasía"],
     genre: "RPG",
     reviews: [],
-  }
+  }*/
 ];
 
 export default function Home({ search = "" }) {

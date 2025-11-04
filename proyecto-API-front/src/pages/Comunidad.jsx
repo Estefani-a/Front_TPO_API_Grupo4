@@ -27,7 +27,7 @@ async function http(method, path, body) {
 const LS_KEY = "community_posts_v1";
 
 const SEED_POSTS = [
-  {
+  /*{
     id: "p1",
     title: "¿Recomiendan Hollow Knight en 2025?",
     content:
@@ -101,7 +101,7 @@ const SEED_POSTS = [
         author: { id: "u8", name: "Rama", avatarUrl: null },
       },
     ],
-  },
+  },*/
 ];
 
 function lsGet() {
