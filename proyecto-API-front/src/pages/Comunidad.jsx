@@ -1,17 +1,25 @@
 // pages/Comunidad.jsx
 import { useEffect, useState } from "react";
 
-const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
+const API_BASE = "http://localhost:8080";
 
 /** ------------------------------
  * Helpers HTTP (API real si existe)
  * ------------------------------ */
-async function http(method, path, body) {
+async function http(method, path, body, requiresAuth = false) {
+  const headers = { "Content-Type": "application/json" };
+  
+  if (requiresAuth) {
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
-    // credentials: "include", // Comentado para evitar conflicto CORS con wildcard
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -19,171 +27,6 @@ async function http(method, path, body) {
   }
   const ct = res.headers.get("content-type") || "";
   return ct.includes("application/json") ? res.json() : null;
-}
-
-/** ------------------------------
- * Fallback en localStorage
- * ------------------------------ */
-const LS_KEY = "community_posts_v1";
-
-const SEED_POSTS = [
-  /*{
-    id: "p1",
-    title: "¿Recomiendan Hollow Knight en 2025?",
-    content:
-      "Estoy entre HK y Blasphemous 2. Busco algo desafiante pero que no se vuelva frustrante. ¿Qué dicen?",
-    imageUrl:
-      "https://images.igdb.com/igdb/image/upload/t_cover_big/co1r8f.jpg",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    likesCount: 7,
-    likedByMe: false,
-    author: { id: "u1", name: "Nico", avatarUrl: null },
-    comments: [
-      {
-        id: "c1",
-        text:
-          "HK es una joya. Si te gustan los metroidvania con exploración libre, ni lo dudes. Consejo: andá por Mantis Lords temprano 😉",
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),
-        author: { id: "u2", name: "Paz", avatarUrl: null },
-      },
-      {
-        id: "c2",
-        text:
-          "Si querés más combate y estética barroca, Blasphe 2. Si querés mapear y perderte, HK.",
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3.2).toISOString(),
-        author: { id: "u3", name: "Lucho", avatarUrl: null },
-      },
-    ],
-  },
-  {
-    id: "p2",
-    title: "Recomendación coop local en PC",
-    content:
-      "¿Alguno probó It Takes Two o A Way Out? Busco algo para jugar a pantalla partida con mi novia.",
-    imageUrl: "",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(),
-    likesCount: 12,
-    likedByMe: true,
-    author: { id: "u4", name: "Meli", avatarUrl: null },
-    comments: [
-      {
-        id: "c3",
-        text:
-          "It Takes Two va como trompada. Puzzles creativos y duración justa (10-12hs). Si les gusta cooperar de verdad, es top.",
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 28).toISOString(),
-        author: { id: "u5", name: "Tom", avatarUrl: null },
-      },
-      {
-        id: "c4",
-        text:
-          "A Way Out es más cinemático. Para primera experiencia en coop sofá, yo arrancaría por It Takes Two.",
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
-        author: { id: "u6", name: "Clau", avatarUrl: null },
-      },
-    ],
-  },
-  {
-    id: "p3",
-    title: "Tips para optimizar FPS en PC gama media",
-    content:
-      "RX 7600 + R5 5600: ¿qué ajustes recomiendan para llegar a 120Hz en shooters? ¿FSR on u off?",
-    imageUrl: "",
-    createdAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
-    likesCount: 5,
-    likedByMe: false,
-    author: { id: "u7", name: "Cami", avatarUrl: null },
-    comments: [
-      {
-        id: "c5",
-        text:
-          "Bajá sombras y oclusión ambiental. Texturas en Alto si tenés VRAM. FSR 2 on en Quality suele sumar FPS sin matar nitidez.",
-        createdAt: new Date(Date.now() - 1000 * 60 * 85).toISOString(),
-        author: { id: "u8", name: "Rama", avatarUrl: null },
-      },
-    ],
-  },*/
-];
-
-function lsGet() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-function lsSet(data) {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-  } catch {}
-}
-function uid(prefix = "id") {
-  return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
-}
-
-/** API local de fallback */
-const localApi = {
-  list: async () => {
-    let data = lsGet();
-    if (!data) {
-      data = SEED_POSTS;
-      lsSet(data);
-    }
-    await delay(150); // mímica de red
-    return structuredClone(data);
-  },
-  create: async (post) => {
-    const data = lsGet() || [];
-    const newPost = {
-      id: uid("p"),
-      title: post.title || "",
-      content: post.content || "",
-      imageUrl: post.imageUrl || "",
-      createdAt: new Date().toISOString(),
-      likesCount: 0,
-      likedByMe: false,
-      author: { id: "me", name: "Vos", avatarUrl: null },
-      comments: [],
-    };
-    data.unshift(newPost);
-    lsSet(data);
-    await delay(120);
-    return structuredClone(newPost);
-  },
-  comment: async (postId, text) => {
-    const data = lsGet() || [];
-    const idx = data.findIndex((p) => p.id === postId);
-    if (idx < 0) throw new Error("Post no encontrado");
-    const c = {
-      id: uid("c"),
-      text: text || "",
-      createdAt: new Date().toISOString(),
-      author: { id: "me", name: "Vos", avatarUrl: null },
-    };
-    const updated = { ...data[idx], comments: [...data[idx].comments, c] };
-    data[idx] = updated;
-    lsSet(data);
-    await delay(120);
-    return structuredClone(updated);
-  },
-  like: async (postId) => {
-    const data = lsGet() || [];
-    const idx = data.findIndex((p) => p.id === postId);
-    if (idx < 0) throw new Error("Post no encontrado");
-    const p = data[idx];
-    // toggle simple (sin usuarios)
-    const liked = !p.likedByMe;
-    const likesCount = (p.likesCount || 0) + (liked ? 1 : -1);
-    const updated = { ...p, likedByMe: liked, likesCount: Math.max(likesCount, 0) };
-    data[idx] = updated;
-    lsSet(data);
-    await delay(100);
-    return structuredClone(updated);
-  },
-};
-
-function delay(ms) {
-  return new Promise((r) => setTimeout(r, ms));
 }
 
 /** ------------------------------
@@ -209,62 +52,82 @@ function transformBackendPost(post) {
 }
 
 /** ------------------------------
- * Capa de servicios (elige API real o local)
+ * Capa de servicios (usa API de la base de datos)
  * ------------------------------ */
-const useLocal = !API_BASE; // si no hay VITE_API_URL → usa local
-console.log("🔧 API_BASE:", API_BASE);
-console.log("🔧 useLocal:", useLocal);
 
 async function listPosts() {
-  console.log("📡 listPosts() - useLocal:", useLocal);
-  if (useLocal) {
-    console.log("📦 Usando localStorage");
-    return localApi.list();
-  }
   try {
     console.log("🌐 Llamando a API:", `${API_BASE}/community/posts`);
     const data = await http("GET", "/community/posts");
     console.log("✅ Datos recibidos del backend:", data);
-    if (Array.isArray(data) && data.length) {
+    
+    if (Array.isArray(data)) {
       // Transformar datos del backend al formato esperado
       const transformed = data.map(transformBackendPost);
       console.log("🔄 Datos transformados:", transformed);
       return transformed;
     }
-    // si viene vacío del server, igual mostramos seed local
-    console.log("⚠️ Backend vacío, usando localStorage");
-    return localApi.list();
+    return [];
   } catch (error) {
-    // si falla server, fallback local
-    console.error("❌ Error al llamar API, usando localStorage:", error);
-    return localApi.list();
+    console.error("❌ Error al llamar API:", error);
+    throw error;
   }
 }
+
 async function createPost(payload) {
-  if (useLocal) return localApi.create(payload);
   try {
-    const created = await http("POST", "/community/posts", payload);
-    return created ?? localApi.create(payload);
-  } catch {
-    return localApi.create(payload);
+    // Obtener el usuario actual del localStorage
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const authorName = currentUser.name || 'Usuario';
+    
+    // Agregar el authorName al payload
+    const postData = {
+      title: payload.title || '',
+      content: payload.content || '',
+      imageUrl: payload.imageUrl || '',
+      category: payload.category || 'General',
+      authorName: authorName
+    };
+    
+    console.log('📝 Creando post:', postData);
+    const created = await http("POST", "/community/posts", postData, true);
+    console.log('✅ Post creado:', created);
+    return transformBackendPost(created);
+  } catch (error) {
+    console.error('❌ Error al crear post:', error);
+    throw error;
   }
 }
+
 async function addComment(postId, text) {
-  if (useLocal) return localApi.comment(postId, text);
   try {
-    const updated = await http("POST", `/community/posts/${postId}/comments`, { text });
-    return updated ?? localApi.comment(postId, text);
-  } catch {
-    return localApi.comment(postId, text);
+    // Obtener el usuario actual del localStorage
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userName = currentUser.name || 'Usuario';
+    
+    // El backend retorna el comentario creado, no el post actualizado
+    const comment = await http("POST", `/community/comments/post/${postId}`, { 
+      content: text,
+      userName: userName
+    }, true);
+    console.log('✅ Comentario creado:', comment);
+    
+    // Necesitamos refrescar el post completo para obtener la lista actualizada de comentarios
+    const updatedPost = await http("GET", `/community/posts/${postId}`);
+    return transformBackendPost(updatedPost);
+  } catch (error) {
+    console.error('❌ Error al crear comentario:', error);
+    throw error;
   }
 }
+
 async function likePost(postId) {
-  if (useLocal) return localApi.like(postId);
   try {
-    const updated = await http("POST", `/community/posts/${postId}/like`);
-    return updated ?? localApi.like(postId);
-  } catch {
-    return localApi.like(postId);
+    const updated = await http("POST", `/community/posts/${postId}/like`, null, true);
+    return transformBackendPost(updated);
+  } catch (error) {
+    console.error('❌ Error al dar like:', error);
+    throw error;
   }
 }
 
@@ -276,6 +139,15 @@ export default function Comunidad() {
   const [creating, setCreating] = useState(false);
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
+  const [notification, setNotification] = useState(null);
+
+  // Verificar si el usuario es admin
+  const isAdmin = typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true';
+
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   useEffect(() => {
     (async () => {
@@ -297,14 +169,21 @@ export default function Comunidad() {
     const title = String(fd.get("title") || "").trim();
     const content = String(fd.get("content") || "").trim();
     const imageUrl = String(fd.get("imageUrl") || "").trim();
-    if (!title && !content) return;
+    if (!title && !content) {
+      showNotification('Debes escribir al menos un título o contenido', 'error');
+      return;
+    }
     try {
       setCreating(true);
       const created = await createPost({ title, content, imageUrl });
-      if (created) setPosts((p) => [created, ...p]);
-      e.currentTarget.reset();
+      if (created) {
+        setPosts((p) => [created, ...p]);
+        showNotification('Post creado correctamente', 'success');
+        e.currentTarget.reset();
+      }
     } catch (e) {
-      alert(e.message || e);
+      console.error('Error al crear post:', e);
+      showNotification(e.message || 'Error al crear el post', 'error');
     } finally {
       setCreating(false);
     }
@@ -322,7 +201,17 @@ export default function Comunidad() {
       );
       const updated = await likePost(p.id);
       if (updated) setPosts((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-    } catch {}
+    } catch (error) {
+      console.error('Error al dar like:', error);
+      // Revertir el cambio optimista si falla
+      setPosts((prev) =>
+        prev.map((x) =>
+          x.id === p.id
+            ? { ...x, likedByMe: p.likedByMe, likesCount: p.likesCount }
+            : x
+        )
+      );
+    }
   }
 
   async function handleComment(p, e) {
@@ -332,10 +221,91 @@ export default function Comunidad() {
     if (!text) return;
     try {
       const updated = await addComment(p.id, text);
-      if (updated) setPosts((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-      e.currentTarget.reset();
+      if (updated) {
+        setPosts((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+        showNotification('Comentario agregado', 'success');
+        e.currentTarget.reset();
+      }
     } catch (e) {
-      alert(e.message || e);
+      console.error('Error al comentar:', e);
+      showNotification(e.message || 'Error al comentar', 'error');
+    }
+  }
+
+  async function handleDeletePost(postId, postTitle) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar el post "${postTitle}"?\n\nEsto eliminará también todos sus comentarios.`)) {
+      return;
+    }
+
+    try {
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        showNotification('Debes iniciar sesión como admin', 'error');
+        return;
+      }
+
+      console.log(`🗑️ Eliminando post ID: ${postId}`);
+
+      const response = await fetch(`http://localhost:8080/community/posts/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+
+      if (response.ok) {
+        console.log('✅ Post eliminado correctamente');
+        setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+        showNotification('Post eliminado correctamente', 'success');
+      } else {
+        console.error('❌ Error al eliminar:', response.status);
+        showNotification('Error al eliminar el post', 'error');
+      }
+    } catch (error) {
+      console.error('❌ Error de red:', error);
+      showNotification('Error de conexión', 'error');
+    }
+  }
+
+  async function handleDeleteComment(postId, commentId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+      return;
+    }
+
+    try {
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        showNotification('Debes iniciar sesión como admin', 'error');
+        return;
+      }
+
+      console.log(`🗑️ Eliminando comentario ID: ${commentId}`);
+
+      const response = await fetch(`http://localhost:8080/community/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+
+      if (response.ok) {
+        console.log('✅ Comentario eliminado correctamente');
+        // Actualizar el post eliminando el comentario de la lista
+        setPosts(prevPosts => 
+          prevPosts.map(post => 
+            post.id === postId 
+              ? { ...post, comments: post.comments.filter(c => c.id !== commentId) }
+              : post
+          )
+        );
+        showNotification('Comentario eliminado correctamente', 'success');
+      } else {
+        console.error('❌ Error al eliminar comentario:', response.status);
+        showNotification('Error al eliminar el comentario', 'error');
+      }
+    } catch (error) {
+      console.error('❌ Error de red:', error);
+      showNotification('Error de conexión', 'error');
     }
   }
 
@@ -378,11 +348,22 @@ export default function Comunidad() {
         <div style={{ display: "grid", gap: 12 }}>
           {posts.map((p) => (
             <article key={p.id} style={styles.card}>
-              <header style={{ marginBottom: 8 }}>
-                <div style={{ fontWeight: 700, color: "#cfe5f6" }}>{p.title}</div>
-                <small style={{ color: "#9fb3c1" }}>
-                  {p.author?.name || "Anónimo"} · {formatDate(p.createdAt)}
-                </small>
+              <header style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: "#cfe5f6" }}>{p.title}</div>
+                  <small style={{ color: "#9fb3c1" }}>
+                    {p.author?.name || "Anónimo"} · {formatDate(p.createdAt)}
+                  </small>
+                </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDeletePost(p.id, p.title)}
+                    style={styles.deleteBtn}
+                    title="Eliminar post"
+                  >
+                    🗑️
+                  </button>
+                )}
               </header>
               {p.content && <p style={{ whiteSpace: "pre-wrap", marginTop: 8 }}>{p.content}</p>}
               {p.imageUrl && (
@@ -404,11 +385,22 @@ export default function Comunidad() {
                 <h4 style={{ margin: "8px 0", color: "#cfe5f6" }}>Comentarios</h4>
                 <div style={{ display: "grid", gap: 6 }}>
                   {(p.comments || []).map((c) => (
-                    <div key={c.id} style={styles.comment}>
-                      <small style={{ color: "#9fb3c1" }}>
-                        {c.author?.name || "Alguien"} · {formatDate(c.createdAt)}
-                      </small>
-                      <div>{c.text}</div>
+                    <div key={c.id} style={{ ...styles.comment, display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                      <div style={{ flex: 1 }}>
+                        <small style={{ color: "#9fb3c1" }}>
+                          {c.author?.name || "Alguien"} · {formatDate(c.createdAt)}
+                        </small>
+                        <div>{c.text}</div>
+                      </div>
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeleteComment(p.id, c.id)}
+                          style={styles.deleteCommentBtn}
+                          title="Eliminar comentario"
+                        >
+                          ✕
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -422,6 +414,62 @@ export default function Comunidad() {
           ))}
         </div>
       )}
+
+      {/* Notificación Toast */}
+      {notification && (
+        <div style={{
+          position: 'fixed',
+          top: 80,
+          right: 24,
+          background: notification.type === 'success' ? '#5c7e10' : notification.type === 'error' ? '#c1272d' : '#2a475e',
+          color: '#fff',
+          padding: '16px 24px',
+          borderRadius: 8,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+          zIndex: 9999,
+          minWidth: 300,
+          maxWidth: 400,
+          animation: 'slideIn 0.3s ease-out',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          fontSize: 15,
+          fontWeight: 500
+        }}>
+          <span style={{ fontSize: 20 }}>
+            {notification.type === 'success' ? '✓' : notification.type === 'error' ? '✕' : 'ℹ'}
+          </span>
+          <span style={{ flex: 1 }}>{notification.message}</span>
+          <button
+            onClick={() => setNotification(null)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#fff',
+              fontSize: 18,
+              cursor: 'pointer',
+              padding: 4,
+              opacity: 0.7,
+              lineHeight: 1
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </main>
   );
 }
@@ -472,6 +520,27 @@ const styles = {
     background: "#2a475e",
     borderRadius: 6,
     padding: "6px 8px",
+  },
+  deleteBtn: {
+    background: "#c1272d",
+    color: "#fff",
+    border: "none",
+    borderRadius: 6,
+    padding: "6px 12px",
+    cursor: "pointer",
+    fontSize: 16,
+    transition: "opacity 0.2s",
+  },
+  deleteCommentBtn: {
+    background: "transparent",
+    color: "#c1272d",
+    border: "none",
+    borderRadius: 4,
+    padding: "4px 8px",
+    cursor: "pointer",
+    fontSize: 16,
+    fontWeight: "bold",
+    transition: "background 0.2s",
   },
 };
 

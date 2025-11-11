@@ -4,6 +4,7 @@ import HeaderSteam from "./components/HeaderSteam";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import Users from "./pages/users";
 import Home from "./pages/home";
 import Checkout from "./pages/checkout";
 import GameDetail from "./pages/GameDetail";
@@ -127,6 +128,7 @@ export default function App() {
         <Route path="/" element={<Home addToCart={addToCart} cart={cart} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/users" element={<Users />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/game/:id" element={<GameDetail />} />
         <Route path="/acerca-de" element={<AcercaDe />} />

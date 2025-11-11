@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Categorías de Juegos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1b2838 0%, #2a475e 100%);
+            color: #c7d5e0;
+            padding: 40px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #171a21;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #66c0f4;
+            margin-top: 0;
+        }
+        button {
+            background: linear-gradient(90deg, #06bfff 0%, #2d89ef 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #1fb5f0 0%, #358fe0 100%);
+        }
+        button:disabled {
+            background: #4b6479;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .log div {
+            margin: 5px 0;
+        }
+        .success { color: #90ba3c; }
+        .error { color: #c1272d; }
+        .info { color: #66c0f4; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Actualizar Categorías de Juegos</h1>
+        <p>Esta herramienta actualizará los juegos existentes con sus categorías correspondientes.</p>
+        
+        <button onclick="updateAllGames()" id="updateBtn">Actualizar Todos los Juegos</button>
+        <button onclick="clearLog()">Limpiar Log</button>
+        
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = type;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        // Mapeo de juegos a sus categorías
+        const gameCategories = {
+            'Counter-Strike 2': ['Shooter', 'Multiplayer', 'Táctico'],
+            'Grand Theft Auto V': ['Acción', 'Mundo Abierto', 'Crimen', 'Aventura'],
+            'Red Dead Redemption 2': ['Acción', 'Aventura', 'Western', 'Mundo Abierto'],
+            'Cyberpunk 2077': ['RPG', 'Acción', 'Futurista', 'Mundo Abierto'],
+            'HELLDIVERS 2': ['Shooter', 'Cooperativo', 'Acción', 'Multiplayer'],
+            'Palworld': ['Aventura', 'Criaturas', 'Supervivencia', 'Mundo Abierto']
+        };
+        
+        async function updateAllGames() {
+            const btn = document.getElementById('updateBtn');
+            btn.disabled = true;
+            clearLog();
+            
+            try {
+                log('🔍 Obteniendo tipos de juegos...', 'info');
+                const typesResponse = await fetch(`${API_URL}/gametypes`);
+                const allTypes = await typesResponse.json();
+                log(`✓ ${allTypes.length} tipos encontrados`, 'success');
+                
+                log('🔍 Obteniendo juegos...', 'info');
+                const gamesResponse = await fetch(`${API_URL}/games`);
+                const games = await gamesResponse.json();
+                log(`✓ ${games.length} juegos encontrados`, 'success');
+                
+                // Obtener el token JWT del admin
+                const authToken = localStorage.getItem('authToken');
+                if (!authToken) {
+                    log('❌ No hay sesión de admin. Por favor inicia sesión como admin primero.', 'error');
+                    alert('Debes iniciar sesión como admin (admin@admin / admin) primero en la aplicación principal.');
+                    btn.disabled = false;
+                    return;
+                }
+                
+                log('🔑 Token de autenticación encontrado', 'success');
+                log('', 'info');
+                
+                // Actualizar cada juego
+                for (const game of games) {
+                    const gameName = game.name;
+                    const categories = gameCategories[gameName];
+                    
+                    if (!categories) {
+                        log(`⚠️ ${gameName}: Sin categorías definidas, saltando...`, 'error');
+                        continue;
+                    }
+                    
+                    log(`📝 Actualizando ${gameName}...`, 'info');
+                    
+                    // Mapear categorías a objetos con ID
+                    const types = categories.map(catName => {
+                        const type = allTypes.find(t => 
+                            t.type.toLowerCase() === catName.toLowerCase()
+                        );
+                        if (!type) {
+                            log(`  ⚠️ Tipo "${catName}" no encontrado`, 'error');
+                            return null;
+                        }
+                        return { id: type.id, type: type.type };
+                    }).filter(Boolean);
+                    
+                    if (types.length === 0) {
+                        log(`  ❌ No se pudieron mapear las categorías`, 'error');
+                        continue;
+                    }
+                    
+                    // Preparar datos del juego
+                    const gameData = {
+                        name: game.name,
+                        cost: game.cost,
+                        description: game.description || `Juego ${gameName}`,
+                        images: game.images || [],
+                        types: types,
+                        comments: game.comments || []
+                    };
+                    
+                    // Actualizar juego
+                    try {
+                        const response = await fetch(`${API_URL}/games/${game.id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`
+                            },
+                            body: JSON.stringify(gameData)
+                        });
+                        
+                        if (response.ok) {
+                            log(`  ✓ ${gameName}: ${types.map(t => t.type).join(', ')}`, 'success');
+                        } else {
+                            const error = await response.text();
+                            log(`  ❌ Error al actualizar: ${error}`, 'error');
+                        }
+                    } catch (error) {
+                        log(`  ❌ Error de red: ${error.message}`, 'error');
+                    }
+                }
+                
+                log('', 'info');
+                log('✅ Proceso completado', 'success');
+                log('🔄 Recarga la página principal para ver los cambios', 'info');
+                
+            } catch (error) {
+                log(`❌ Error general: ${error.message}`, 'error');
+            }
+            
+            btn.disabled = false;
+        }
+        
+        // Verificar si hay sesión al cargar
+        window.addEventListener('load', () => {
+            const authToken = localStorage.getItem('authToken');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (authToken && currentUser) {
+                const user = JSON.parse(currentUser);
+                log(`👤 Sesión activa: ${user.name} ${user.isAdmin ? '(Admin)' : ''}`, 'success');
+                if (!user.isAdmin) {
+                    log('⚠️ ADVERTENCIA: No tienes permisos de administrador', 'error');
+                }
+            } else {
+                log('⚠️ No hay sesión activa. Inicia sesión como admin primero.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

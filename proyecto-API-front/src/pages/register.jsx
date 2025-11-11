@@ -1,5 +1,6 @@
 // Importación del componente Link de React Router para navegación entre páginas
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
+import { useState } from "react";
 // Importación de los estilos CSS específicos para componentes de autenticación
 import "./auth.css";  
 
@@ -7,9 +8,16 @@ import "./auth.css";
 export default function Register() {   
   // Variable local que contiene el prefijo de clase CSS para mantener consistencia en nombres
   const auth = "auth";
+  const [notification, setNotification] = useState(null);
+  
+  // Función para mostrar notificaciones
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   // FUNCIÓN PARA MANEJAR EL ENVÍO DEL FORMULARIO DE REGISTRO
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     // Prevenir el comportamiento por defecto del form (recarga de página)
     e.preventDefault();
     
@@ -22,51 +30,82 @@ export default function Register() {
     // VALIDACIONES DEL FORMULARIO
     // Verificar que todos los campos estén completos
     if (!name || !email || !password || !confirmPassword) {
-      alert("Por favor completa todos los campos");
+      showNotification("Por favor completa todos los campos", "error");
       return;
     }
     
     // Verificar que las contraseñas coincidan
     if (password !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      showNotification("Las contraseñas no coinciden", "error");
       return;
     }
     
     // Verificar que la contraseña tenga al menos 6 caracteres
     if (password.length < 6) {
-      alert("La contraseña debe tener al menos 6 caracteres");
+      showNotification("La contraseña debe tener al menos 6 caracteres", "error");
       return;
     }
     
-    // VERIFICAR SI EL USUARIO YA EXISTE
-    // Obtener usuarios existentes del localStorage
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Verificar si el email ya está registrado
-    if (existingUsers.find(user => user.email === email)) {
-      alert("Este email ya está registrado");
-      return;
+    try {
+      console.log('📤 Enviando datos de registro:', { name, email });
+      
+      // ENVIAR PETICIÓN AL BACKEND PARA REGISTRAR USUARIO
+      const response = await fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password
+        })
+      });
+      
+      console.log('📡 Respuesta recibida:', response.status, response.statusText);
+      
+      // VERIFICAR SI EL REGISTRO FUE EXITOSO
+      if (response.ok) {
+        const userData = await response.json();
+        console.log('✅ Usuario registrado exitosamente en la BASE DE DATOS:', userData);
+        console.log('📊 ID del usuario en la base de datos:', userData.id);
+        console.log('👤 Datos del usuario:', {
+          id: userData.id,
+          name: userData.name,
+          email: userData.email,
+          role: userData.role
+        });
+        
+        // REGISTRO EXITOSO
+        showNotification(`¡Cuenta creada exitosamente! Ahora puedes iniciar sesión`, 'success');
+        
+        // Redirigir a la página de login
+        setTimeout(() => window.location.href = "/", 2000);
+      } else {
+        // MANEJAR ERRORES DEL SERVIDOR
+        let errorMessage = "Error al registrar usuario. Por favor intenta nuevamente.";
+        
+        try {
+          const errorData = await response.json();
+          console.error('❌ Error del servidor:', errorData);
+          
+          // Verificar si el error es por email duplicado
+          if (response.status === 409 || errorData.message?.includes('email') || errorData.message?.includes('uso')) {
+            errorMessage = "Este email ya está registrado. Por favor usa otro email o inicia sesión.";
+          } else {
+            errorMessage = errorData.message || errorMessage;
+          }
+        } catch (parseError) {
+          console.error('❌ Error al parsear respuesta:', parseError);
+        }
+        
+        showNotification(errorMessage, 'error');
+      }
+    } catch (error) {
+      // MANEJAR ERRORES DE CONEXIÓN
+      console.error('❌ Error al registrar usuario:', error);
+      showNotification(`Error de conexión con el servidor. Por favor verifica que el backend esté funcionando.`, 'error');
     }
-    
-    // CREAR NUEVO USUARIO
-    const newUser = {
-      id: Date.now(), // ID único basado en timestamp
-      name,
-      email,
-      password, // En un sistema real, esto debería estar hasheado
-      createdAt: new Date().toISOString()
-    };
-    
-    // GUARDAR USUARIO EN LOCALSTORAGE
-    // Agregar el nuevo usuario al array y guardarlo
-    existingUsers.push(newUser);
-    localStorage.setItem('users', JSON.stringify(existingUsers));
-    
-    // REGISTRO EXITOSO
-    alert("¡Registro exitoso! Ahora puedes iniciar sesión");
-    
-    // Redirigir a la página de login
-    window.location.href = "/";
   };      
 
   return (
@@ -159,9 +198,72 @@ export default function Register() {
               Inicia sesión
             </Link>
           </p>
+
+          {/* ENLACE PARA VER USUARIOS REGISTRADOS */}
+          <p className={`${auth}-switch-text`} style={{ marginTop: 10 }}>
+            <Link to="/users" className={`${auth}-link`}>
+              👥 Ver usuarios registrados en la base de datos
+            </Link>
+          </p>
           
         </div>
       </div>
+      
+      {/* Notificación Toast */}
+      {notification && (
+        <div style={{
+          position: 'fixed',
+          top: 80,
+          right: 24,
+          background: notification.type === 'success' ? '#5c7e10' : notification.type === 'error' ? '#c1272d' : '#2a475e',
+          color: '#fff',
+          padding: '16px 24px',
+          borderRadius: 8,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+          zIndex: 9999,
+          minWidth: 300,
+          maxWidth: 400,
+          animation: 'slideIn 0.3s ease-out',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          fontSize: 15,
+          fontWeight: 500
+        }}>
+          <span style={{ fontSize: 20 }}>
+            {notification.type === 'success' ? '✓' : notification.type === 'error' ? '✕' : 'ℹ'}
+          </span>
+          <span style={{ flex: 1 }}>{notification.message}</span>
+          <button
+            onClick={() => setNotification(null)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#fff',
+              fontSize: 18,
+              cursor: 'pointer',
+              padding: 4,
+              opacity: 0.7,
+              lineHeight: 1
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   ); 
 }

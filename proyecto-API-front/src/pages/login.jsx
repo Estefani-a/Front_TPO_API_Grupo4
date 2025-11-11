@@ -1,15 +1,23 @@
 // Importación del componente Link de React Router para navegación entre páginas
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
+import { useState } from "react";
 // Importación de los estilos CSS específicos para componentes de autenticación
 import "./auth.css";  
 
 // Exportación por defecto del componente funcional Login
 export default function Login() {   
   // Variable local que contiene el prefijo de clase CSS para mantener consistencia
-  const auth = "auth";      
+  const auth = "auth";
+  const [notification, setNotification] = useState(null);
+  
+  // Función para mostrar notificaciones
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };      
 
   // FUNCIÓN PARA MANEJAR EL ENVÍO DEL FORMULARIO
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     // Prevenir el comportamiento por defecto del form (recarga de página)
     e.preventDefault();
     
@@ -21,53 +29,80 @@ export default function Login() {
     
     // VALIDACIÓN DE CAMPOS VACÍOS
     if (!email || !password) {
-      alert("Por favor completa todos los campos");
+      showNotification("Por favor completa todos los campos", "error");
       return;
     }
     
-    // VALIDACIÓN DE CREDENCIALES DE ADMINISTRADOR
-    // Verificar si las credenciales coinciden con el admin hardcodeado
-    if (email === "admin@admin" && password === "admin") {
-      // AUTENTICACIÓN EXITOSA PARA ADMIN
-      // Guardar en localStorage que el usuario es administrador
-      localStorage.setItem("isAdmin", "true");
-      localStorage.setItem("currentUser", JSON.stringify({
-        name: "Administrador",
-        email: "admin@admin",
-        isAdmin: true
-      }));
-      // Redirigir a la página principal usando navegación nativa del navegador
-      window.location.href = "/";
-      // Terminar ejecución de la función aquí
-      return;
+    try {
+      console.log('📤 Intentando iniciar sesión con:', email);
+      
+      // ENVIAR PETICIÓN AL BACKEND PARA AUTENTICAR USUARIO
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
+      });
+      
+      console.log('📡 Respuesta recibida:', response.status, response.statusText);
+      
+      // VERIFICAR SI LA AUTENTICACIÓN FUE EXITOSA
+      if (response.ok) {
+        const authData = await response.json();
+        console.log('✅ Login exitoso:', authData);
+        
+        // Verificar si el usuario es administrador
+        const isAdmin = authData.role === 'ADMIN';
+        
+        // Guardar token JWT y datos del usuario
+        localStorage.setItem("authToken", authData.token);
+        if (isAdmin) {
+          localStorage.setItem("isAdmin", "true");
+        } else {
+          localStorage.removeItem("isAdmin");
+        }
+        localStorage.setItem("currentUser", JSON.stringify({
+          name: authData.name,
+          email: authData.email,
+          role: authData.role,
+          isAdmin: isAdmin
+        }));
+        
+        // AUTENTICACIÓN EXITOSA
+        showNotification(`¡Bienvenido ${authData.name}!${isAdmin ? ' 🔑 (Admin)' : ''}`, 'success');
+        
+        // Redirigir a la página principal
+        setTimeout(() => window.location.href = "/", 1000);
+      } else {
+        // MANEJAR ERRORES DEL SERVIDOR
+        console.error('❌ Error en login, status:', response.status);
+        
+        let errorMessage = "Error al iniciar sesión. Por favor intenta nuevamente.";
+        
+        try {
+          const errorData = await response.json();
+          console.error('❌ Detalles del error:', errorData);
+          
+          if (response.status === 401 || response.status === 400) {
+            errorMessage = "Email o contraseña incorrectos. Por favor verifica tus credenciales.";
+          } else {
+            errorMessage = errorData.message || errorMessage;
+          }
+        } catch (parseError) {
+          console.error('❌ Error al parsear respuesta:', parseError);
+        }
+        
+        showNotification(errorMessage, 'error');
+      }
+    } catch (error) {
+      // MANEJAR ERRORES DE CONEXIÓN
+      console.error('❌ Error al iniciar sesión:', error);
+      showNotification(`Error de conexión con el servidor. Por favor verifica que el backend esté funcionando.`, 'error');
     }
-    
-    // VALIDACIÓN DE CREDENCIALES DE USUARIOS REGISTRADOS
-    // Obtener lista de usuarios del localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Buscar usuario con email y contraseña coincidentes
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-      // AUTENTICACIÓN EXITOSA PARA USUARIO REGISTRADO
-      // Limpiar flag de admin ya que es usuario regular
-      localStorage.removeItem("isAdmin");
-      // Guardar información del usuario actual
-      localStorage.setItem("currentUser", JSON.stringify({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        isAdmin: false
-      }));
-      // Redirigir a la página principal
-      window.location.href = "/";
-      return;
-    }
-    
-    // CREDENCIALES INCORRECTAS
-    // Mostrar alerta si ninguna credencial coincide
-    alert("Email o contraseña incorrectos");
   };
 
   return (
@@ -135,9 +170,72 @@ export default function Login() {
               Regístrate
             </Link>
           </p>
+
+          {/* ENLACE PARA VER USUARIOS REGISTRADOS */}
+          <p className={`${auth}-switch-text`} style={{ marginTop: 10 }}>
+            <Link to="/users" className={`${auth}-link`}>
+              👥 Ver usuarios registrados en la base de datos
+            </Link>
+          </p>
           
         </div>
       </div>
+      
+      {/* Notificación Toast */}
+      {notification && (
+        <div style={{
+          position: 'fixed',
+          top: 80,
+          right: 24,
+          background: notification.type === 'success' ? '#5c7e10' : notification.type === 'error' ? '#c1272d' : '#2a475e',
+          color: '#fff',
+          padding: '16px 24px',
+          borderRadius: 8,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+          zIndex: 9999,
+          minWidth: 300,
+          maxWidth: 400,
+          animation: 'slideIn 0.3s ease-out',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          fontSize: 15,
+          fontWeight: 500
+        }}>
+          <span style={{ fontSize: 20 }}>
+            {notification.type === 'success' ? '✓' : notification.type === 'error' ? '✕' : 'ℹ'}
+          </span>
+          <span style={{ flex: 1 }}>{notification.message}</span>
+          <button
+            onClick={() => setNotification(null)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#fff',
+              fontSize: 18,
+              cursor: 'pointer',
+              padding: 4,
+              opacity: 0.7,
+              lineHeight: 1
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   ); 
 };

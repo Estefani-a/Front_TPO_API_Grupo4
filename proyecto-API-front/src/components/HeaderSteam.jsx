@@ -8,27 +8,34 @@ const steamLogo = "https://store.cloudflare.steamstatic.com/public/shared/images
 export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFromCart, total }) {
   // Estados del header y utilidades
   const [showTagDropdown, setShowTagDropdown] = React.useState(false);
-  // Obtener tags únicos de todos los juegos (incluyendo custom)
-  const ALL_TAGS = [
-    "Shooter", "Multiplayer", "Táctico", "Acción", "Mundo Abierto", "Crimen", "Aventura", "Western", "RPG", "Futurista", "Cooperativo", "Criaturas", "Supervivencia", "Multijugador",
-    "Indie", "Estrategia", "Simulación", "Deportes", "Puzzle", "Terror", "Educativo", "Casual", "Aventura gráfica", "Plataformas"
-  ];
-  const getAllTags = () => {
-    let tags = [...ALL_TAGS];
-    try {
-      const rawGames = localStorage.getItem('customGames');
-      if (rawGames) {
-        const customGames = JSON.parse(rawGames);
-        customGames.forEach(game => {
-          if (Array.isArray(game.tags)) {
-            game.tags.forEach(tag => {
-              if (!tags.includes(tag)) tags.push(tag);
-            });
-          }
-        });
+  const [notification, setNotification] = React.useState(null);
+  
+  // Función para mostrar notificaciones
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
+  // Obtener tags desde la API
+  const [availableTags, setAvailableTags] = React.useState([]);
+  
+  React.useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/gametypes');
+        if (response.ok) {
+          const types = await response.json();
+          const tags = types.map(t => t.type);
+          setAvailableTags(tags);
+        }
+      } catch (error) {
+        console.error('Error cargando tags:', error);
       }
-    } catch {}
-    return Array.from(new Set(tags));
+    };
+    fetchTags();
+  }, []);
+  
+  const getAllTags = () => {
+    return availableTags;
   };
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,53 +72,61 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
   const [showLogin, setShowLogin] = React.useState(false);
   const [showRegister, setShowRegister] = React.useState(false);
 
-  // Handlers de formularios del popup
-  const handleLoginSubmit = (e) => {
+  // Handlers de formularios del popup - Ahora usan la API
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     const email = e.target.email.value.toLowerCase().trim();
     const password = e.target.password.value;
     
     // Validar campos vacíos
     if (!email || !password) {
-      alert("Por favor completa todos los campos");
+      showNotification("Por favor completa todos los campos", "error");
       return;
     }
     
-    // Verificar credenciales de admin
-    if (email === 'admin@admin' && password === 'admin') {
-      localStorage.setItem('isAdmin', 'true');
-      localStorage.setItem('currentUser', JSON.stringify({
-        name: "Administrador",
-        email: "admin@admin",
-        isAdmin: true
-      }));
-      setShowLogin(false);
-      // Refrescar para que el header tome el estado admin inmediatamente
-      window.location.reload();
-      return;
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Guardar token y datos del usuario
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('currentUser', JSON.stringify({
+          name: data.name,
+          email: data.email,
+          isAdmin: data.role === 'ADMIN'
+        }));
+        
+        // Guardar flag de admin si corresponde
+        if (data.role === 'ADMIN') {
+          localStorage.setItem('isAdmin', 'true');
+        } else {
+          localStorage.removeItem('isAdmin');
+        }
+        
+        showNotification(`¡Bienvenido ${data.name}!${data.role === 'ADMIN' ? ' (Admin)' : ''}`, 'success');
+        setShowLogin(false);
+        setTimeout(() => window.location.reload(), 1000);
+      } else if (response.status === 401) {
+        showNotification('Email o contraseña incorrectos', 'error');
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        showNotification(errorData.message || 'Error al iniciar sesión', 'error');
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      showNotification('Error de conexión. Por favor verifica que el servidor esté activo.', 'error');
     }
-    
-    // Verificar credenciales de usuarios registrados
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-      localStorage.removeItem('isAdmin');
-      localStorage.setItem('currentUser', JSON.stringify({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        isAdmin: false
-      }));
-      setShowLogin(false);
-      window.location.reload();
-      return;
-    }
-    
-    alert('Email o contraseña incorrectos');
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     const name = e.target.name.value.trim();
     const email = e.target.email.value.toLowerCase().trim();
@@ -120,42 +135,46 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
     
     // Validaciones
     if (!name || !email || !password || !confirmPassword) {
-      alert("Por favor completa todos los campos");
+      showNotification("Por favor completa todos los campos", "error");
       return;
     }
     
     if (password !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      showNotification("Las contraseñas no coinciden", "error");
       return;
     }
     
     if (password.length < 6) {
-      alert("La contraseña debe tener al menos 6 caracteres");
+      showNotification("La contraseña debe tener al menos 6 caracteres", "error");
       return;
     }
     
-    // Verificar si el usuario ya existe
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    if (existingUsers.find(user => user.email === email)) {
-      alert("Este email ya está registrado");
-      return;
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showNotification(`¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.`, 'success');
+        setTimeout(() => {
+          setShowRegister(false);
+          setShowLogin(true);
+        }, 1500);
+      } else if (response.status === 409) {
+        showNotification('Este email ya está registrado. Por favor usa otro email.', 'error');
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        showNotification(errorData.message || 'Error al registrar usuario', 'error');
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      showNotification('Error de conexión. Por favor verifica que el servidor esté activo.', 'error');
     }
-    
-    // Crear nuevo usuario
-    const newUser = {
-      id: Date.now(),
-      name,
-      email,
-      password,
-      createdAt: new Date().toISOString()
-    };
-    
-    existingUsers.push(newUser);
-    localStorage.setItem('users', JSON.stringify(existingUsers));
-    
-    alert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.');
-    setShowRegister(false);
-    setShowLogin(true);
   };
 
   return (
@@ -573,36 +592,128 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
       {/* Modal para agregar juego */}
       {showAddModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.45)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowAddModal(false)}>
-          <form onClick={e => e.stopPropagation()} style={{ background: '#23262e', borderRadius: 12, padding: '32px 32px 24px 32px', minWidth: 340, boxShadow: '0 4px 24px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', gap: 18 }} onSubmit={e => {
+          <form onClick={e => e.stopPropagation()} style={{ background: '#23262e', borderRadius: 12, padding: '32px 32px 24px 32px', minWidth: 340, boxShadow: '0 4px 24px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', gap: 18 }} onSubmit={async e => {
             e.preventDefault();
-            const tagsFormatted = form.tags.split(',').map(t => {
-              const tag = t.trim();
-              return tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
-            }).filter(Boolean);
-            const newGame = {
-              id: Date.now(),
-              title: form.title,
-              image: form.image,
-              description: form.description,
-              tags: tagsFormatted,
-              price: parseFloat(form.price),
-              images: [
-                form.screenshot1 || form.image,
-                form.screenshot2 || form.image,
-                form.screenshot3 || form.image,
-                form.screenshot4 || form.image
-              ].filter(Boolean),
-              rating: 4.0,
-              reviews: [],
-            };
-            const raw = localStorage.getItem('customGames');
-            const customGames = raw ? JSON.parse(raw) : [];
-            customGames.push(newGame);
-            localStorage.setItem('customGames', JSON.stringify(customGames));
-            window.dispatchEvent(new CustomEvent('customGames-updated'));
-            setShowAddModal(false);
-            setForm({ title: '', image: '', description: '', tags: '', price: '', screenshot1: '', screenshot2: '', screenshot3: '', screenshot4: '' });
-            alert('Juego agregado correctamente');
+            
+            // Validar campos requeridos
+            if (!form.title || !form.image || !form.description || !form.price || !form.tags) {
+              showNotification('Por favor completa todos los campos requeridos', 'error');
+              return;
+            }
+            
+            try {
+              // Formatear tags
+              const tagsFormatted = form.tags.split(',').map(t => {
+                const tag = t.trim();
+                return tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
+              }).filter(Boolean);
+              
+              console.log('📋 Tags a procesar:', tagsFormatted);
+              
+              // 1. Obtener todos los tipos existentes de la base de datos
+              const typesResponse = await fetch('http://localhost:8080/api/gametypes');
+              if (!typesResponse.ok) {
+                throw new Error('Error al obtener tipos de juegos');
+              }
+              const existingTypes = await typesResponse.json();
+              console.log('📊 Tipos existentes en BD:', existingTypes);
+              
+              // 2. Crear o encontrar los tipos para este juego
+              const types = [];
+              for (const tagName of tagsFormatted) {
+                // Normalizar y buscar si el tipo ya existe
+                const normalizedTag = tagName.trim();
+                let existingType = existingTypes.find(t => {
+                  const normalizedExisting = t.type.trim();
+                  return normalizedExisting.toLowerCase() === normalizedTag.toLowerCase();
+                });
+                
+                if (existingType) {
+                  // Si existe, usar su ID
+                  console.log(`✓ Tipo "${normalizedTag}" ya existe con ID: ${existingType.id}`);
+                  types.push({
+                    id: existingType.id,
+                    type: existingType.type
+                  });
+                } else {
+                  // Si no existe, crearlo
+                  console.log(`➕ Creando nuevo tipo: "${normalizedTag}"`);
+                  const createTypeResponse = await fetch('http://localhost:8080/api/gametypes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: normalizedTag })
+                  });
+                  
+                  if (createTypeResponse.ok) {
+                    const newType = await createTypeResponse.json();
+                    console.log(`✅ Tipo creado: ${newType.type} (ID: ${newType.id})`);
+                    // Agregar el nuevo tipo a la lista para futuras referencias
+                    existingTypes.push(newType);
+                    types.push({
+                      id: newType.id,
+                      type: newType.type
+                    });
+                  } else {
+                    const errorText = await createTypeResponse.text();
+                    console.error(`❌ Error al crear tipo "${normalizedTag}":`, errorText);
+                    throw new Error(`Error al crear tipo: ${normalizedTag}`);
+                  }
+                }
+              }
+              
+              console.log('✅ Tipos finales a usar:', types);
+              
+              // Preparar imágenes (screenshots)
+              const images = [
+                form.image,
+                form.screenshot1,
+                form.screenshot2,
+                form.screenshot3,
+                form.screenshot4
+              ].filter(Boolean);
+              
+              // Preparar datos para el backend según GameDTO
+              const gameData = {
+                name: form.title,
+                cost: parseFloat(form.price),
+                description: form.description,
+                images: images,
+                types: types,
+                comments: []
+              };
+              
+              console.log('📤 Enviando juego al backend:', gameData);
+              
+              // Enviar al backend
+              const response = await fetch('http://localhost:8080/api/games', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(gameData)
+              });
+              
+              if (response.ok) {
+                const savedGame = await response.json();
+                console.log('✅ Juego guardado en la base de datos:', savedGame);
+                
+                showNotification(`Juego "${savedGame.name}" agregado correctamente`, 'success');
+                
+                // Limpiar formulario y cerrar modal
+                setShowAddModal(false);
+                setForm({ title: '', image: '', description: '', tags: '', price: '', screenshot1: '', screenshot2: '', screenshot3: '', screenshot4: '' });
+                
+                // Recargar página para mostrar el nuevo juego
+                setTimeout(() => window.location.reload(), 1500);
+              } else {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('❌ Error al guardar juego:', errorData);
+                showNotification(errorData.message || 'Error al agregar el juego', 'error');
+              }
+            } catch (error) {
+              console.error('❌ Error:', error);
+              showNotification(error.message || 'Error de conexión. Verifica que el servidor esté activo.', 'error');
+            }
           }}>
             <h3 style={{ color: '#66c0f4', marginBottom: 8 }}>Agregar juego</h3>
             <input type="text" placeholder="Nombre del juego" value={form.title} required onChange={e => setForm(f => ({ ...f, title: e.target.value }))} style={{ padding: 8, borderRadius: 6, border: 'none', fontSize: 15 }} />
@@ -673,6 +784,62 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
           </form>
         </div>
       )}
+      
+      {/* Notificación Toast */}
+      {notification && (
+        <div style={{
+          position: 'fixed',
+          top: 80,
+          right: 24,
+          background: notification.type === 'success' ? '#5c7e10' : notification.type === 'error' ? '#c1272d' : '#2a475e',
+          color: '#fff',
+          padding: '16px 24px',
+          borderRadius: 8,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+          zIndex: 9999,
+          minWidth: 300,
+          maxWidth: 400,
+          animation: 'slideIn 0.3s ease-out',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          fontSize: 15,
+          fontWeight: 500
+        }}>
+          <span style={{ fontSize: 20 }}>
+            {notification.type === 'success' ? '✓' : notification.type === 'error' ? '✕' : 'ℹ'}
+          </span>
+          <span style={{ flex: 1 }}>{notification.message}</span>
+          <button
+            onClick={() => setNotification(null)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#fff',
+              fontSize: 18,
+              cursor: 'pointer',
+              padding: 4,
+              opacity: 0.7,
+              lineHeight: 1
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </header>
   );
 }

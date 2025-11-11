@@ -6,7 +6,8 @@ const ArrowIcon = ({ direction = 'right' }) => (
   </svg>
 );
 
-const featuredGames = [
+// Juegos por defecto en caso de que la API falle
+const defaultGames = [
   {
     id: 1,
     title: "Counter-Strike 2",
@@ -65,6 +66,50 @@ const featuredGames = [
 
 const SteamCarousel = ({ addToCart, cart, navigate }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [featuredGames, setFeaturedGames] = useState(defaultGames);
+  const [loading, setLoading] = useState(true);
+
+  // Cargar juegos desde la API
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        console.log('🎮 Intentando cargar juegos desde la API...');
+        const response = await fetch('http://localhost:8080/api/games');
+        console.log('📡 Respuesta recibida:', response.status);
+        
+        if (response.ok) {
+          const games = await response.json();
+          console.log('✅ Juegos cargados desde API:', games.length, 'juegos');
+          
+          // Transformar los datos de la API al formato del carrusel
+          const transformedGames = games.map(game => ({
+            id: game.id,
+            title: game.name,
+            price: game.cost,
+            tags: game.types?.map(type => type.type) || ["Juego", "Acción"],
+            mainImage: game.images && game.images.length > 0 
+              ? game.images[0] 
+              : "https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg",
+            color: "linear-gradient(90deg, #ff9800 60%, #f44336 100%)",
+            description: game.description || "Un increíble juego que no te puedes perder"
+          }));
+          
+          console.log('🎯 Juegos transformados:', transformedGames);
+          setFeaturedGames(transformedGames);
+        } else {
+          console.warn('⚠️ API respondió con error:', response.status);
+        }
+      } catch (error) {
+        console.error('❌ Error cargando juegos:', error);
+        console.log('🔄 Usando juegos por defecto');
+        // Mantener los juegos por defecto si falla la API
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGames();
+  }, []);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % featuredGames.length);
@@ -109,6 +154,15 @@ const SteamCarousel = ({ addToCart, cart, navigate }) => {
       }
     }
   };
+
+  // Mostrar indicador de carga
+  if (loading) {
+    return (
+      <div style={{ width: '100%', maxWidth: '1200px', margin: '32px auto', textAlign: 'center', color: '#66c0f4', padding: '100px 0' }}>
+        <h2>Cargando juegos destacados...</h2>
+      </div>
+    );
+  }
 
   return (
     <>

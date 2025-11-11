@@ -230,6 +230,8 @@ export default function GameDetail() {
   const OverallRating = ({ rating = 4.5 }) => {
     // Calcular estrellas completas
     const fullStars = Math.floor(rating);
+    // Formatear rating con 2 decimales
+    const formattedRating = rating.toFixed(2);
     return (
       <div className="overall-rating">
         <div className="star-rating">
@@ -242,8 +244,8 @@ export default function GameDetail() {
               ★
             </span>
           ))}
-          {/* Mostrar calificación numérica */}
-          <span className="rating-text">({rating}/5)</span>
+          {/* Mostrar calificación numérica con 2 decimales */}
+          <span className="rating-text">({formattedRating}/5)</span>
         </div>
         <p className="rating-subtitle">Calificación general</p>
       </div>
