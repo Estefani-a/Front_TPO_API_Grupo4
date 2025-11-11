@@ -94,8 +94,10 @@ const SteamCarousel = ({ addToCart, cart, navigate }) => {
             description: game.description || "Un increíble juego que no te puedes perder"
           }));
           
-          console.log('🎯 Juegos transformados:', transformedGames);
-          setFeaturedGames(transformedGames);
+          // Limitar a máximo 6 juegos
+          const limitedGames = transformedGames.slice(0, 6);
+          console.log('🎯 Juegos transformados (máximo 6):', limitedGames.length);
+          setFeaturedGames(limitedGames);
         } else {
           console.warn('⚠️ API respondió con error:', response.status);
         }

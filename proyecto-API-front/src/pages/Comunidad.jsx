@@ -165,7 +165,8 @@ export default function Comunidad() {
 
   async function handleCreate(e) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const title = String(fd.get("title") || "").trim();
     const content = String(fd.get("content") || "").trim();
     const imageUrl = String(fd.get("imageUrl") || "").trim();
@@ -179,11 +180,10 @@ export default function Comunidad() {
       if (created) {
         setPosts((p) => [created, ...p]);
         showNotification('Post creado correctamente', 'success');
-        e.currentTarget.reset();
+        form.reset();
       }
-    } catch (e) {
-      console.error('Error al crear post:', e);
-      showNotification(e.message || 'Error al crear el post', 'error');
+    } catch (error) {
+      showNotification(error.message || 'Error al crear el post', 'error');
     } finally {
       setCreating(false);
     }
@@ -216,7 +216,8 @@ export default function Comunidad() {
 
   async function handleComment(p, e) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const text = String(fd.get("text") || "").trim();
     if (!text) return;
     try {
@@ -224,11 +225,10 @@ export default function Comunidad() {
       if (updated) {
         setPosts((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
         showNotification('Comentario agregado', 'success');
-        e.currentTarget.reset();
+        form.reset();
       }
-    } catch (e) {
-      console.error('Error al comentar:', e);
-      showNotification(e.message || 'Error al comentar', 'error');
+    } catch (error) {
+      showNotification(error.message || 'Error al comentar', 'error');
     }
   }
 
