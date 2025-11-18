@@ -17,6 +17,7 @@ Este proyecto es una implementación frontend de un clon de Steam, una popular p
 - **Vite** - Herramienta de compilación que ofrece una experiencia de desarrollo más rápida
 - **React Router** - Manejo de navegación y rutas en la aplicación
 - **CSS Modules** - Estilizado modular y escalable
+- **Docker** - Contenerización del frontend y backend ejecutados mediante Docker Compose
 
 ## Funcionalidades Principales
 
@@ -82,7 +83,31 @@ Para ejecutar el proyecto es necesario contar con:
 
 ## Como Ejecutar
 
-1. Clonar el repositorio:
+El proyecto se ejecuta completamente con Docker, no es necesario levantar el frontend o backend manualmente y por separado. 
+<br>
+
+
+### Ejecutar con Docker 🐳
+
+1. Clonar el repositorio (si no lo tenemos):
+```bash
+git clone <url-del-repositorio>
+```
+2. Abrir Docker desktop y MySQL (verificar que la BD este conectada)
+
+3. Ejecutar frontend y backend con Docker
+```bash
+docker compose up --build
+```
+
+4. Abrir [http://localhost:3000](http://localhost:3000) en el navegador para verificar que funciona el frontend
+   
+5. Abrir [http://localhost:8080/games](http://localhost:8080/games) en el navegador para verificar que funciona el backend o probar con Postman <br><br>
+
+
+### Ejecutar sin Docker
+
+1. Clonar el repositorio (si no lo tenemos):
 ```bash
 git clone <url-del-repositorio>
 ```
@@ -98,7 +123,7 @@ npm install
 npm run dev
 ```
 
-4. Abrir [http://localhost:5173](http://localhost:5173) en el navegador
+4. Abrir [http://localhost:5173](http://localhost:5173) en el navegador <br><br>
 
 ## Autores 👨‍💻👩‍💻
 
