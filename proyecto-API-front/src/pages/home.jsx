@@ -83,7 +83,9 @@ export default function Home({ search = "" }) {
     const fetchGames = async () => {
       console.log('🎮 Cargando juegos desde la API...');
       try {
-        const response = await fetch('http://localhost:8080/api/games');
+        //const response = await fetch('http://localhost:8080/api/games');
+        const response = await fetch('/api/games');
+        
         console.log('📡 Respuesta recibida:', response.status);
         
         if (response.ok) {
@@ -333,7 +335,8 @@ export default function Home({ search = "" }) {
       console.log(`🗑️ Eliminando juego ID: ${gameId}`);
       
       // Eliminar de la base de datos
-      const response = await fetch(`http://localhost:8080/api/games/${gameId}`, {
+      //const response = await fetch(`http://localhost:8080/api/games/${gameId}`, 
+      const response = await fetch(`/api/games/${gameId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authToken}`

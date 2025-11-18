@@ -5,7 +5,8 @@
 // Solo se guarda la sesión actual del usuario logueado
 // ====================================================================
 
-const API_URL = 'http://localhost:8080/api/auth';
+//const API_URL = 'http://localhost:8080/api/auth';
+const API_URL = '/api/auth';
 
 /**
  * Obtiene el usuario actualmente logueado desde la sesión

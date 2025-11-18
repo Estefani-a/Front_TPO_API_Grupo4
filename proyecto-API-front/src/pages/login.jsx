@@ -37,7 +37,8 @@ export default function Login() {
       console.log('📤 Intentando iniciar sesión con:', email);
       
       // ENVIAR PETICIÓN AL BACKEND PARA AUTENTICAR USUARIO
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      //const response = await fetch('http://localhost:8080/api/auth/login', 
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

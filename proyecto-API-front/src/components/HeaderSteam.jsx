@@ -21,7 +21,8 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
   React.useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/gametypes');
+        //const response = await fetch('http://localhost:8080/api/gametypes');
+        const response = await fetch('/api/gametypes');
         if (response.ok) {
           const types = await response.json();
           const tags = types.map(t => t.type);
@@ -85,7 +86,8 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
     }
     
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      //const response = await fetch('http://localhost:8080/api/auth/login',
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +152,8 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
     }
     
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
+      //const response = await fetch('http://localhost:8080/api/auth/register', 
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -611,7 +614,9 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
               console.log('📋 Tags a procesar:', tagsFormatted);
               
               // 1. Obtener todos los tipos existentes de la base de datos
-              const typesResponse = await fetch('http://localhost:8080/api/gametypes');
+              //const typesResponse = await fetch('http://localhost:8080/api/gametypes');
+              const typesResponse = await fetch('/api/gametypes');
+              
               if (!typesResponse.ok) {
                 throw new Error('Error al obtener tipos de juegos');
               }
@@ -638,7 +643,8 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
                 } else {
                   // Si no existe, crearlo
                   console.log(`➕ Creando nuevo tipo: "${normalizedTag}"`);
-                  const createTypeResponse = await fetch('http://localhost:8080/api/gametypes', {
+                  //const createTypeResponse = await fetch('http://localhost:8080/api/gametypes',
+                  const createTypeResponse = await fetch('/api/gametypes',{
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type: normalizedTag })
@@ -685,7 +691,8 @@ export default function HeaderSteam({ cart = [], showCart, setShowCart, removeFr
               console.log('📤 Enviando juego al backend:', gameData);
               
               // Enviar al backend
-              const response = await fetch('http://localhost:8080/api/games', {
+              //const response = await fetch('http://localhost:8080/api/games',
+              const response = await fetch('/api/games', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

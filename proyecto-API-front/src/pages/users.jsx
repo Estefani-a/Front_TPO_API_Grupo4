@@ -12,7 +12,8 @@ export default function Users() {
     const fetchUsers = async () => {
       try {
         console.log('📡 Cargando usuarios desde la base de datos...');
-        const response = await fetch('http://localhost:8080/api/auth/users');
+        //const response = await fetch('http://localhost:8080/api/auth/users');
+        const response = await fetch('/api/auth/users');
         
         if (response.ok) {
           const data = await response.json();

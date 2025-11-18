@@ -1,7 +1,7 @@
 // pages/Comunidad.jsx
 import { useEffect, useState } from "react";
 
-const API_BASE = "http://localhost:8080";
+//const API_BASE = "http://localhost:8080";
 
 /** ------------------------------
  * Helpers HTTP (API real si existe)
@@ -57,7 +57,7 @@ function transformBackendPost(post) {
 
 async function listPosts() {
   try {
-    console.log("🌐 Llamando a API:", `${API_BASE}/community/posts`);
+    console.log("🌐 Llamando a API:", `/community/posts`);
     const data = await http("GET", "/community/posts");
     console.log("✅ Datos recibidos del backend:", data);
     
@@ -246,7 +246,8 @@ export default function Comunidad() {
 
       console.log(`🗑️ Eliminando post ID: ${postId}`);
 
-      const response = await fetch(`http://localhost:8080/community/posts/${postId}`, {
+      //const response = await fetch(`http://localhost:8080/community/posts/${postId}`, 
+      const response = await fetch(`/community/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authToken}`
@@ -281,7 +282,8 @@ export default function Comunidad() {
 
       console.log(`🗑️ Eliminando comentario ID: ${commentId}`);
 
-      const response = await fetch(`http://localhost:8080/community/comments/${commentId}`, {
+      //const response = await fetch(`http://localhost:8080/community/comments/${commentId}`, 
+      const response = await fetch(`/community/comments/${commentId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authToken}`

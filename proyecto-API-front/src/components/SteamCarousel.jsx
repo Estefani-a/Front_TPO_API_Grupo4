@@ -74,7 +74,9 @@ const SteamCarousel = ({ addToCart, cart, navigate }) => {
     const fetchGames = async () => {
       try {
         console.log('🎮 Intentando cargar juegos desde la API...');
-        const response = await fetch('http://localhost:8080/api/games');
+        //const response = await fetch('http://localhost:8080/api/games');
+        const response = await fetch('/api/games');
+        
         console.log('📡 Respuesta recibida:', response.status);
         
         if (response.ok) {

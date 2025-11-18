@@ -88,13 +88,15 @@ export default function GameDetail() {
     if (!game?.id) return;
 
     // Obtener comentarios del juego
-    fetch(`http://localhost:8080/comments/game/${game.id}`)
+    //fetch(`http://localhost:8080/comments/game/${game.id}`)
+    fetch(`/api/comments/game/${game.id}`)
       .then(res => res.json())
       .then(data => setComments(data))
       .catch(err => console.error('Error al cargar comentarios:', err));
 
     // Obtener estadísticas
-    fetch(`http://localhost:8080/comments/game/${game.id}/stats`)
+    //fetch(`http://localhost:8080/comments/game/${game.id}/stats`)
+    fetch(`/api/comments/game/${game.id}/stats`)
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(err => console.error('Error al cargar estadísticas:', err));
@@ -110,7 +112,8 @@ export default function GameDetail() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/comments/game/${game.id}`, {
+      //const response = await fetch(`http://localhost:8080/comments/game/${game.id}`,
+      const response = await fetch(`/api/comments/game/${game.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newComment)
@@ -123,7 +126,8 @@ export default function GameDetail() {
         setShowCommentForm(false);
         
         // Recargar estadísticas
-        const statsRes = await fetch(`http://localhost:8080/comments/game/${game.id}/stats`);
+        //const statsRes = await fetch(`http://localhost:8080/comments/game/${game.id}/stats`);
+        const statsRes = await fetch(`/api/comments/game/${game.id}/stats`);
         const newStats = await statsRes.json();
         setStats(newStats);
         
