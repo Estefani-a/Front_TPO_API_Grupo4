@@ -59,17 +59,28 @@ proyecto-API-front/
 │   │   ├── auth.css      # Estilos de autenticación
 │   │   ├── cart.jsx      # Página de carrito
 │   │   ├── checkout.jsx  # Página de compra
-|   |   ├── comunidad,jsx 
+|   |   ├── comunidad.jsx 
 |   |   ├── GameDetail.jsx #Informacion del juego
 │   │   ├── home.jsx      # Página principal
 │   │   ├── login.jsx     # Página de login
 │   │   |── register.jsx  # Página de registro
-|   |   └── Soporte.jsx   # Info y solicitudes de soporte
+|   |   |── Soporte.jsx   # Info y solicitudes de soporte
+|   |   └── users.jsx
+|   |
+|   ├── services/
+|   |   └── authService.js # Hace llamadas al backend para iniciar sesión y registrar usuarios
+|   ├── utils/
+|   |   └── auth.js  # Maneja la sesión del usuario en el frontend, ej: obtener user logueado
 |   |
 │   ├── App.jsx           # Componente principal
 │   ├── App.css           # Estilos globales
 |   ├── index.css         # Estilos base
-│   └── main.jsx          
+│   └── main.jsx
+|
+├── Dockerfile            # Define cómo construir la imagen Docker de la app
+├── docker-compose.yml    # Orquesta y levanta los servicios con Docker.
+├── nginx.conf            # Le indica a Nginx cómo mostrar la app en el navegador.
+├── vite.config.js        # Configura Vite (paths, plugins, server, build).
 └── package.json          # Dependencias y scripts
 ```
 
