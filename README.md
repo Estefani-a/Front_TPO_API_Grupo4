@@ -104,7 +104,13 @@ El proyecto se ejecuta completamente con Docker, no es necesario levantar el fro
 ```bash
 git clone <url-del-repositorio>
 ```
-2. Abrir Docker desktop y MySQL (verificar que la BD este conectada)
+2. Abrir Docker Desktop y asegurarse de que el servicio de MySQL esté levantado con la base `react_db` y el usuario `root` (password `290101`).  
+   Si todavía no tenés la base, podés crear un contenedor compatible con el backend usando:
+```bash
+docker run -d --name mysql-react -p 3306:3306 ^
+  -e MYSQL_ROOT_PASSWORD=290101 ^
+  -e MYSQL_DATABASE=react_db mysql:8.0
+```
 
 3. Ejecutar frontend y backend con Docker
 ```bash
@@ -113,7 +119,7 @@ docker compose up --build
 
 4. Abrir [http://localhost:3000](http://localhost:3000) en el navegador para verificar que funciona el frontend
    
-5. Abrir [http://localhost:8080/games](http://localhost:8080/games) en el navegador para verificar que funciona el backend o probar con Postman <br><br>
+5. Abrir [http://localhost:8080/api/games](http://localhost:8080/api/games) en el navegador o en Postman para verificar que funciona el backend (todos los endpoints REST están bajo `/api`, por ejemplo `/api/auth/login`).<br><br>
 
 
 ### Ejecutar sin Docker
